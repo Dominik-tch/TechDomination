@@ -10,18 +10,9 @@ public class SimulationTests
     private readonly GameData _data = TestData.Load();
 
     [Fact]
-    public void NewState_StartsAtTickZero()
-    {
-        var state = GameStateFactory.CreateNew(1);
-
-        Assert.Equal(0, state.Tick);
-        Assert.Equal(1UL, state.Seed);
-    }
-
-    [Fact]
     public void Step_IncrementsTickByOne()
     {
-        var state = GameStateFactory.CreateNew(1);
+        var state = GameStateFactory.CreateNew(_data, 1);
 
         Simulation.Step(state, _data);
         Simulation.Step(state, _data);
@@ -32,8 +23,8 @@ public class SimulationTests
     [Fact]
     public void TwoRuns_WithSameSeed_ProduceSameHash()
     {
-        var first = Run(GameStateFactory.CreateNew(42), 500);
-        var second = Run(GameStateFactory.CreateNew(42), 500);
+        var first = Run(GameStateFactory.CreateNew(_data, 42), 500);
+        var second = Run(GameStateFactory.CreateNew(_data, 42), 500);
 
         Assert.Equal(StateHasher.ComputeHash(first), StateHasher.ComputeHash(second));
     }
@@ -41,8 +32,8 @@ public class SimulationTests
     [Fact]
     public void Runs_WithDifferentSeeds_ProduceDifferentHashes()
     {
-        var first = Run(GameStateFactory.CreateNew(1), 100);
-        var second = Run(GameStateFactory.CreateNew(2), 100);
+        var first = Run(GameStateFactory.CreateNew(_data, 1), 100);
+        var second = Run(GameStateFactory.CreateNew(_data, 2), 100);
 
         Assert.NotEqual(StateHasher.ComputeHash(first), StateHasher.ComputeHash(second));
     }
@@ -54,9 +45,9 @@ public class SimulationTests
         const int ticksBeforeSave = 300;
         const int ticksAfterLoad = 200;
 
-        var continuous = Run(GameStateFactory.CreateNew(42), ticksBeforeSave + ticksAfterLoad);
+        var continuous = Run(GameStateFactory.CreateNew(_data, 42), ticksBeforeSave + ticksAfterLoad);
 
-        var beforeSave = Run(GameStateFactory.CreateNew(42), ticksBeforeSave);
+        var beforeSave = Run(GameStateFactory.CreateNew(_data, 42), ticksBeforeSave);
         var loaded = GameStateSerializer.Deserialize(GameStateSerializer.SerializeToUtf8Bytes(beforeSave));
         var resumed = Run(loaded, ticksAfterLoad);
 

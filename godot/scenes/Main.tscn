@@ -1,20 +1,59 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/MainScreen.cs" id="1_main"]
+[ext_resource type="Script" path="res://scripts/Main.cs" id="1_main"]
+[ext_resource type="Script" path="res://scripts/map/MapView.cs" id="2_map"]
+[ext_resource type="Script" path="res://scripts/map/MapCamera.cs" id="3_camera"]
+[ext_resource type="Script" path="res://scripts/ui/TickLabel.cs" id="4_tick"]
+[ext_resource type="Script" path="res://scripts/ui/ProvinceInfoPanel.cs" id="5_panel"]
 
-[node name="Main" type="Control"]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="Main" type="Node2D"]
 script = ExtResource("1_main")
 
-[node name="TickLabel" type="Label" parent="."]
-layout_mode = 0
+[node name="MapView" type="Node2D" parent="."]
+script = ExtResource("2_map")
+
+[node name="MapCamera" type="Camera2D" parent="."]
+script = ExtResource("3_camera")
+
+[node name="Hud" type="CanvasLayer" parent="."]
+
+[node name="TickLabel" type="Label" parent="Hud"]
 offset_left = 16.0
 offset_top = 16.0
 offset_right = 316.0
 offset_bottom = 42.0
 text = "Tick: 0"
+script = ExtResource("4_tick")
+
+[node name="ProvinceInfoPanel" type="PanelContainer" parent="Hud"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -276.0
+offset_top = -140.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 0
+grow_vertical = 0
+script = ExtResource("5_panel")
+
+[node name="Content" type="VBoxContainer" parent="Hud/ProvinceInfoPanel"]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="Hud/ProvinceInfoPanel/Content"]
+layout_mode = 2
+text = "Provinz"
+
+[node name="OwnerLabel" type="Label" parent="Hud/ProvinceInfoPanel/Content"]
+layout_mode = 2
+text = "Besitzer:"
+
+[node name="ResourceLabel" type="Label" parent="Hud/ProvinceInfoPanel/Content"]
+layout_mode = 2
+text = "Rohstoff:"
+
+[node name="BuildingsLabel" type="Label" parent="Hud/ProvinceInfoPanel/Content"]
+layout_mode = 2
+text = "Gebäude:"

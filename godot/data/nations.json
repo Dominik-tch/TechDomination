@@ -1,0 +1,8 @@
+{
+  // Fiktive Nationen der Testkarte. Werden mit der Europakarte (M13) ersetzt.
+  "nations": [
+    { "id": "nordreich", "name": "Nordreich", "color": "#3B6EA5" },
+    { "id": "westland", "name": "Westland", "color": "#B5463C" },
+    { "id": "ostmark", "name": "Ostmark", "color": "#4F8A4B" }
+  ]
+}

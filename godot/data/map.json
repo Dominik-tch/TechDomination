@@ -1,0 +1,74 @@
+{
+  // Testkarte für die technische Entwicklung. Wird mit der Europakarte (M13) ersetzt.
+  // Koordinaten in Karteneinheiten, x nach rechts, y nach unten.
+  // "neighbors" = Nachbarn über Land, müssen gegenseitig eingetragen sein.
+  // Inseln ohne Nachbarn sind erlaubt; Landeinheiten erreichen sie nicht.
+  "provinces": [
+    {
+      "id": "nordhafen", "name": "Nordhafen", "resource": "fish", "size": 2, "owner": "nordreich",
+      "neighbors": ["kiefernwald", "weizenfeld"],
+      "outline": [[40, 40], [320, 30], [280, 240], [30, 260]],
+      "label": [165, 140]
+    },
+    {
+      "id": "kiefernwald", "name": "Kiefernwald", "resource": "wood", "size": 3, "owner": "nordreich",
+      "neighbors": ["nordhafen", "eisenberg", "mittelburg", "kohlental"],
+      "outline": [[320, 30], [600, 60], [640, 250], [470, 280], [280, 240]],
+      "label": [460, 150]
+    },
+    {
+      "id": "eisenberg", "name": "Eisenberg", "resource": "steel", "size": 3, "owner": "nordreich",
+      "neighbors": ["kiefernwald", "oelsenke"],
+      "outline": [[600, 60], [860, 40], [880, 270], [640, 250]],
+      "label": [745, 150]
+    },
+    {
+      "id": "weizenfeld", "name": "Weizenfeld", "resource": "grain", "size": 2, "owner": "westland",
+      "neighbors": ["nordhafen", "mittelburg", "suedmark"],
+      "outline": [[30, 260], [280, 240], [250, 500], [50, 480]],
+      "label": [150, 370]
+    },
+    {
+      "id": "mittelburg", "name": "Mittelburg", "resource": "steel", "size": 1, "owner": "westland",
+      "neighbors": ["kiefernwald", "weizenfeld", "kohlental", "gasfeld"],
+      "outline": [[280, 240], [470, 280], [420, 470], [250, 500]],
+      "label": [355, 370]
+    },
+    {
+      "id": "kohlental", "name": "Kohlental", "resource": "coal", "size": 2, "owner": "ostmark",
+      "neighbors": ["kiefernwald", "mittelburg", "oelsenke", "gasfeld"],
+      "outline": [[470, 280], [640, 250], [600, 520], [420, 470]],
+      "label": [530, 380]
+    },
+    {
+      "id": "oelsenke", "name": "Ölsenke", "resource": "oil", "size": 3, "owner": "ostmark",
+      "neighbors": ["eisenberg", "kohlental", "grenzland"],
+      "outline": [[640, 250], [880, 270], [900, 500], [780, 480], [600, 520]],
+      "label": [760, 390]
+    },
+    {
+      "id": "suedmark", "name": "Südmark", "resource": "wood", "size": 2, "owner": "westland",
+      "neighbors": ["weizenfeld", "gasfeld"],
+      "outline": [[50, 480], [250, 500], [330, 690], [60, 680]],
+      "label": [170, 590]
+    },
+    {
+      "id": "gasfeld", "name": "Gasfeld", "resource": "gas", "size": 3, "owner": "westland",
+      "neighbors": ["mittelburg", "kohlental", "suedmark", "grenzland"],
+      "outline": [[250, 500], [420, 470], [600, 520], [560, 670], [330, 690]],
+      "label": [440, 590]
+    },
+    {
+      "id": "grenzland", "name": "Grenzland", "resource": "coal", "size": 2, "owner": "ostmark",
+      "neighbors": ["oelsenke", "gasfeld"],
+      "outline": [[600, 520], [780, 480], [900, 500], [820, 690], [560, 670]],
+      "label": [730, 590]
+    },
+    {
+      "id": "nebelinsel", "name": "Nebelinsel", "resource": "fish", "size": 1, "owner": "nordreich",
+      "neighbors": [],
+      "outline": [[930, 110], [990, 100], [985, 210], [925, 200]],
+      "label": [957, 155]
+    }
+  ]
+}

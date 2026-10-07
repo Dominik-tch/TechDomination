@@ -185,7 +185,8 @@ Godot steuert nur Zeit und Transport bei; die Regeln („wer darf was“) liegen
 - **Schreiben:** ausschließlich über `ICommandSink`. Host/Einzelspieler: Sink ist die lokale Session. Client: Sink sendet ans Netzwerk.
 - **Events:** Beim Host direkt aus `Step()`; beim Client im Zustandsupdate mitgeliefert (siehe 9.2).
 - **Interpolation:** Armeebewegung ist in Ticks gespeichert (Fortschritt/Gesamtdauer). Godot interpoliert die Position visuell – beim Host zwischen Ticks, beim Client zwischen zwei Updates anhand von Tick, Tempo und Bewegungsfortschritt.
-- **Karte:** Provinzformen und -positionen kommen aus Kartendaten. Klick → Provinz-ID (ID-Farbbild oder Polygone, Festlegung in Meilenstein 1).
+- **Karte:** Provinzen sind **Polygone** mit ganzzahligen Kartenkoordinaten in `map.json` (festgelegt in M1). Godot zeichnet sie 1:1 als `Polygon2D`. Ein Klick wird in Kartenkoordinaten umgerechnet und über `MapGeometry.FindProvinceAt` (Core, Ganzzahl-Rechnung, testbar) einer Provinz zugeordnet. Liegt ein Punkt auf einer gemeinsamen Grenze, gewinnt die kleinere ID.
+- **IDs in Daten:** Die Dateien verwenden lesbare String-IDs (`"kohlental"`). Core vergibt daraus typisierte Ganzzahl-IDs in Dateireihenfolge; der Daten-Hash erkennt geänderte Reihenfolgen.
 - **Dateizugriff:** Godot liest die Dateien aus `res://data/` (= `godot/data/`) und Spielstände aus `user://saves/` und übergibt Core den **Inhalt** (String/Stream). Core kennt keine Pfade ([Entscheidung 0003](decisions/0003-datenquelle-godot-data.md)).
 
 ---
@@ -315,10 +316,17 @@ Aus den offenen Fragen in `requirements.md` – spätestens im genannten Meilens
 
 | Frage | Betrifft | Spätestens |
 |---|---|---|
-| Kartenformat / Provinz-Picking (ID-Bild vs. Polygone), Anzahl Provinzen | Data, Godot-MapView | M1 |
+| Anzahl Provinzen der Europakarte | Data | M13 |
 | Wer darf eine Pause aufheben? | Session | M2 |
 | Wovon hängen Steuern ab? Bevölkerung/Moral? | State, Systems | M3 |
 | Welche Landeinheiten? | Data | M7 |
 | Friedensschluss einseitig oder mit Zustimmung? Truppen in fremdem Gebiet bei Frieden? | Commands, Systems | M8 |
 | Startbedingungen (Nationenwahl, Startressourcen, Startarmeen) | Setup | M9 |
 | Schwelle für die Einführung von Deltas | Protocol | nach Messung in M11 |
+
+### Bereits entschieden
+
+| Frage | Entscheidung | Wann |
+|---|---|---|
+| Kartenformat / Provinz-Picking | Polygone in `map.json`, Picking in Core | M1 |
+| Seeverbindungen | Keine. Nachbarschaft gibt es nur über Land; Inseln ohne Landnachbarn sind für Landeinheiten nicht erreichbar | M1 |

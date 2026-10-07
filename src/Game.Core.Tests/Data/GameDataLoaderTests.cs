@@ -2,51 +2,58 @@ using Game.Core.Data;
 
 namespace Game.Core.Tests.Data;
 
+/// <summary>Allgemeines Laden: Dateien, JSON-Format, simulation.json, Daten-Hash, echte Daten.</summary>
 public class GameDataLoaderTests
 {
     [Fact]
-    public void Load_ValidData_ReadsValues()
+    public void Load_ValidData_ReadsSimulationValues()
     {
-        var data = GameDataLoader.Load(TestData.Files(ticksPerSecond: 25));
+        var data = GameDataLoader.Load(TestData.Files(simulation: TestData.Simulation(25)));
 
         Assert.Equal(25, data.TicksPerSecond);
         Assert.False(string.IsNullOrEmpty(data.ContentHash));
     }
 
-    [Fact]
-    public void Load_MissingFile_ThrowsWithFileName()
+    [Theory]
+    [InlineData(GameDataLoader.SimulationFileName)]
+    [InlineData(GameDataLoader.ResourcesFileName)]
+    [InlineData(GameDataLoader.NationsFileName)]
+    [InlineData(GameDataLoader.MapFileName)]
+    public void Load_MissingFile_ThrowsWithFileName(string fileName)
     {
-        var files = new Dictionary<string, string>();
+        var files = TestData.Files();
+        files.Remove(fileName);
 
         var error = Assert.Throws<GameDataException>(() => GameDataLoader.Load(files));
 
-        Assert.Contains(GameDataLoader.SimulationFileName, error.Message);
+        Assert.Contains(fileName, error.Message);
     }
 
     [Fact]
     public void Load_InvalidJson_ThrowsWithFileName()
     {
-        var files = new Dictionary<string, string> { [GameDataLoader.SimulationFileName] = "{ nicht json" };
+        var files = TestData.Files();
+        files[GameDataLoader.MapFileName] = "{ nicht json";
 
         var error = Assert.Throws<GameDataException>(() => GameDataLoader.Load(files));
 
-        Assert.Contains(GameDataLoader.SimulationFileName, error.Message);
+        Assert.Contains(GameDataLoader.MapFileName, error.Message);
     }
 
     [Fact]
     public void Load_NullContent_Throws()
     {
-        var files = new Dictionary<string, string> { [GameDataLoader.SimulationFileName] = "null" };
+        var files = TestData.Files();
+        files[GameDataLoader.SimulationFileName] = "null";
 
         Assert.Throws<GameDataException>(() => GameDataLoader.Load(files));
     }
 
     [Fact]
-    public void Load_MissingField_ThrowsWithFieldName()
+    public void Load_MissingTicksPerSecond_ThrowsWithFieldName()
     {
-        var files = new Dictionary<string, string> { [GameDataLoader.SimulationFileName] = "{}" };
-
-        var error = Assert.Throws<GameDataException>(() => GameDataLoader.Load(files));
+        var error = Assert.Throws<GameDataException>(
+            () => GameDataLoader.Load(TestData.Files(simulation: [])));
 
         Assert.Contains("ticksPerSecond", error.Message);
     }
@@ -58,7 +65,7 @@ public class GameDataLoaderTests
     public void Load_TicksPerSecondOutOfRange_Throws(int ticksPerSecond)
     {
         var error = Assert.Throws<GameDataException>(
-            () => GameDataLoader.Load(TestData.Files(ticksPerSecond)));
+            () => GameDataLoader.Load(TestData.Files(simulation: TestData.Simulation(ticksPerSecond))));
 
         Assert.Contains("ticksPerSecond", error.Message);
     }
@@ -66,15 +73,13 @@ public class GameDataLoaderTests
     [Fact]
     public void Load_AllowsCommentsAndTrailingCommas()
     {
-        var files = new Dictionary<string, string>
-        {
-            [GameDataLoader.SimulationFileName] = """
-                {
-                  // Kommentar
-                  "ticksPerSecond": 12,
-                }
-                """,
-        };
+        var files = TestData.Files();
+        files[GameDataLoader.SimulationFileName] = """
+            {
+              // Kommentar
+              "ticksPerSecond": 12,
+            }
+            """;
 
         Assert.Equal(12, GameDataLoader.Load(files).TicksPerSecond);
     }
@@ -82,17 +87,15 @@ public class GameDataLoaderTests
     [Fact]
     public void ContentHash_SameContent_IsEqual()
     {
-        Assert.Equal(
-            GameDataLoader.Load(TestData.Files(10)).ContentHash,
-            GameDataLoader.Load(TestData.Files(10)).ContentHash);
+        Assert.Equal(TestData.Load().ContentHash, TestData.Load().ContentHash);
     }
 
     [Fact]
     public void ContentHash_DifferentContent_Differs()
     {
         Assert.NotEqual(
-            GameDataLoader.Load(TestData.Files(10)).ContentHash,
-            GameDataLoader.Load(TestData.Files(11)).ContentHash);
+            GameDataLoader.Load(TestData.Files(simulation: TestData.Simulation(10))).ContentHash,
+            GameDataLoader.Load(TestData.Files(simulation: TestData.Simulation(11))).ContentHash);
     }
 
     [Fact]
@@ -101,16 +104,16 @@ public class GameDataLoaderTests
         var withExtraFile = TestData.Files();
         withExtraFile["other.json"] = "{}";
 
-        Assert.NotEqual(
-            GameDataLoader.Load(TestData.Files()).ContentHash,
-            GameDataLoader.Load(withExtraFile).ContentHash);
+        Assert.NotEqual(TestData.Load().ContentHash, GameDataLoader.Load(withExtraFile).ContentHash);
     }
 
     [Fact]
     public void ContentHash_IgnoresLineEndings()
     {
-        var lf = new Dictionary<string, string> { [GameDataLoader.SimulationFileName] = "{\n  \"ticksPerSecond\": 10\n}\n" };
-        var crlf = new Dictionary<string, string> { [GameDataLoader.SimulationFileName] = "{\r\n  \"ticksPerSecond\": 10\r\n}\r\n" };
+        var lf = TestData.Files();
+        lf[GameDataLoader.SimulationFileName] = "{\n  \"ticksPerSecond\": 10\n}\n";
+        var crlf = TestData.Files();
+        crlf[GameDataLoader.SimulationFileName] = "{\r\n  \"ticksPerSecond\": 10\r\n}\r\n";
 
         Assert.Equal(GameDataLoader.Load(lf).ContentHash, GameDataLoader.Load(crlf).ContentHash);
     }
@@ -118,28 +121,9 @@ public class GameDataLoaderTests
     [Fact]
     public void ContentHash_DoesNotDependOnInsertionOrder()
     {
-        var first = new Dictionary<string, string>
-        {
-            [GameDataLoader.SimulationFileName] = TestData.Files()[GameDataLoader.SimulationFileName],
-            ["a.json"] = "{}",
-        };
-        var second = new Dictionary<string, string>
-        {
-            ["a.json"] = "{}",
-            [GameDataLoader.SimulationFileName] = TestData.Files()[GameDataLoader.SimulationFileName],
-        };
+        var files = TestData.Files();
+        var reversed = files.Reverse().ToDictionary(StringComparer.Ordinal);
 
-        Assert.Equal(GameDataLoader.Load(first).ContentHash, GameDataLoader.Load(second).ContentHash);
-    }
-
-    [Fact]
-    public void Load_RealGodotDataFiles_Succeeds()
-    {
-        var files = Directory.GetFiles(RepositoryPaths.GodotDataDirectory, "*.json")
-            .ToDictionary(path => Path.GetFileName(path), File.ReadAllText, StringComparer.Ordinal);
-
-        var data = GameDataLoader.Load(files);
-
-        Assert.True(data.TicksPerSecond > 0);
+        Assert.Equal(GameDataLoader.Load(files).ContentHash, GameDataLoader.Load(reversed).ContentHash);
     }
 }

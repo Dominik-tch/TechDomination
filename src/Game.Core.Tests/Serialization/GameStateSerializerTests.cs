@@ -54,6 +54,18 @@ public class GameStateSerializerTests
     }
 
     [Fact]
+    public void RoundTrip_PreservesProvinceOwners()
+    {
+        var state = CreateAdvancedState(seed: 7, ticks: 5);
+        state.GetProvince(new ProvinceId(2)).Owner = new NationId(0);
+
+        var loaded = GameStateSerializer.Deserialize(GameStateSerializer.SerializeToUtf8Bytes(state));
+
+        Assert.Equal(state.Provinces.Select(p => p.Owner), loaded.Provinces.Select(p => p.Owner));
+        Assert.Equal(new NationId(0), loaded.GetProvince(new ProvinceId(2)).Owner);
+    }
+
+    [Fact]
     public void RoundTrip_ViaStream_ProducesIdenticalJson()
     {
         var state = CreateAdvancedState(seed: 3, ticks: 10);
@@ -77,7 +89,7 @@ public class GameStateSerializerTests
     [Fact]
     public void Deserialize_MissingRng_Throws()
     {
-        byte[] json = Encoding.UTF8.GetBytes("""{ "seed": 1, "tick": 0 }""");
+        byte[] json = Encoding.UTF8.GetBytes("""{ "seed": 1, "tick": 0, "provinces": [] }""");
 
         Assert.Throws<ArgumentNullException>(() => GameStateSerializer.Deserialize(json));
     }
@@ -85,7 +97,7 @@ public class GameStateSerializerTests
     private static GameState CreateAdvancedState(ulong seed, int ticks)
     {
         var data = TestData.Load();
-        var state = GameStateFactory.CreateNew(seed);
+        var state = GameStateFactory.CreateNew(data, seed);
         for (int i = 0; i < ticks; i++)
         {
             Simulation.Step(state, data);

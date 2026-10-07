@@ -1,0 +1,51 @@
+using Game.Core;
+using Godot;
+
+namespace TechDomination.UI;
+
+/// <summary>Zeigt Name, Besitzer, Rohstoff und Gebäude der ausgewählten Provinz.</summary>
+public partial class ProvinceInfoPanel : PanelContainer
+{
+    private Label _nameLabel = null!;
+    private Label _ownerLabel = null!;
+    private Label _resourceLabel = null!;
+    private Label _buildingsLabel = null!;
+    private SimulationDriver _driver = null!;
+    private ProvinceId? _province;
+
+    public override void _Ready()
+    {
+        _nameLabel = GetNode<Label>("Content/NameLabel");
+        _ownerLabel = GetNode<Label>("Content/OwnerLabel");
+        _resourceLabel = GetNode<Label>("Content/ResourceLabel");
+        _buildingsLabel = GetNode<Label>("Content/BuildingsLabel");
+        _driver = GetNode<SimulationDriver>("/root/SimulationDriver");
+        Visible = false;
+    }
+
+    public void ShowProvince(ProvinceId? province)
+    {
+        _province = province;
+        Visible = province is not null;
+        Refresh();
+    }
+
+    // Der Besitzer kann sich ändern, solange das Panel offen ist.
+    public override void _Process(double delta) => Refresh();
+
+    private void Refresh()
+    {
+        if (_province is not { } id || _driver.Data is not { } data || _driver.State is not { } state)
+        {
+            return;
+        }
+
+        var province = data.GetProvince(id);
+        _nameLabel.Text = province.Name;
+        _ownerLabel.Text = $"Besitzer: {data.GetNation(state.GetProvince(id).Owner).Name}";
+        _resourceLabel.Text = $"Rohstoff: {data.GetResource(province.Resource).Name}";
+
+        // Gebäude kommen mit Meilenstein M5.
+        _buildingsLabel.Text = "Gebäude: keine";
+    }
+}

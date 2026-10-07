@@ -38,7 +38,7 @@ public partial class SimulationDriver : Node
             return;
         }
 
-        State = GameStateFactory.CreateNew(DefaultSeed);
+        State = GameStateFactory.CreateNew(Data, DefaultSeed);
     }
 
     public override void _Process(double delta)
