@@ -20,7 +20,7 @@ Architektur: docs/architecture.md, Entscheidungen: docs/decisions/.
 - Jede Spieleraktion ist ein Command. Spieler, KI und Netzwerk erzeugen nur Commands.
 - Der Spielzustand ist reine, serialisierbare Daten.
 - Zeit wird in Ticks gemessen, nie in Sekunden oder Frames.
-- Zufall nur über Seeded-RNGs: der Simulations-RNG im Spielzustand, die KI hat einen eigenen RNG mit festem Seed (siehe docs/decisions/0002).
+- Zufall nur über Seeded-RNGs: der Simulations-RNG im Spielzustand, die KI hat einen eigenen RNG mit festem Seed, dessen Zustand im Host-Spielstand liegt, nicht im GameState (siehe docs/decisions/0002).
 - Simulation deterministisch halten: keine `float`/`double`, kein `System.Random`, keine Abhängigkeit von Dictionary-/HashSet-Reihenfolge.
 - Balancing-Werte (Bauzeiten, Geschwindigkeiten, Kosten, Rezepte, Preise) stehen in `godot/data/`, nicht im Code.
 - Game.Core kennt keine Dateipfade: Daten und Spielstände bekommt Core als Inhalt (String/Stream) übergeben.

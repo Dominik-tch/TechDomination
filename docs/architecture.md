@@ -197,14 +197,15 @@ Godot steuert nur Zeit und Transport bei; die Regeln („wer darf was“) liegen
   - Regelwerk-Kennung + Hash
   - `GameState` (vollständig, inkl. Simulations-RNG und Tick)
   - Session-Metadaten: Spieler-Slots (Nation → Spielername / KI), damit Spieler beim Laden ihre Nation wieder übernehmen
-  - Host-only-Zustand: KI-Zustand inkl. KI-RNG ([Entscheidung 0002](decisions/0002-eigener-ki-zufallsgenerator.md))
+  - Host-only-Zustand: KI-Zustand inkl. Zustand des KI-RNG. Er liegt **im Spielstand des Hosts neben dem `GameState`, nicht darin** – der synchronisierte `GameState` enthält ihn nie ([Entscheidung 0002](decisions/0002-eigener-ki-zufallsgenerator.md)).
 - Format: JSON über `System.Text.Json`, komprimiert. Dieselbe `GameState`-Serialisierung wird für Netzwerk-Snapshots verwendet.
 - Gespeichert wird **nur an Tick-Grenzen**, nur vom Host.
 - Ablage: `user://saves/` (Godot), Core arbeitet nur mit Streams.
 - **Laden im Multiplayer:** Host lädt, Spieler verbinden sich und werden über den Spielernamen ihrer Nation zugeordnet. Nicht verbundene Spieler → Status „Verbindungsverlust“ (pausiert, Host kann KI einsetzen).
 
 **Kerntest (ab Meilenstein 0, wächst mit jedem Feature):**
-`N Ticks laufen → speichern → laden → M Ticks` ergibt denselben Zustands-Hash wie `N+M Ticks am Stück` mit denselben Commands (inkl. KI).
+`N Ticks laufen → speichern → laden → M Ticks` ergibt denselben Zustands-Hash wie `N+M Ticks am Stück` mit denselben Commands.
+Mit KI-Spielern hält der Test nur, weil der KI-RNG-Zustand mitgespeichert und beim Laden wiederhergestellt wird: Die KI erzeugt nach dem Laden exakt dieselben Commands wie ohne Unterbrechung. Ab M10 vergleicht der Test zusätzlich den KI-Zustand.
 
 ---
 
@@ -265,7 +266,7 @@ Entscheidung und Begründung: [0001 – Snapshot-Sync statt Command-Relay](decis
 
 - Lebt in `Game.Core/AI`, liest den Zustand, gibt Commands zurück. Nutzt **dieselben Commands und Validierung** wie Spieler (Feature 9).
 - Läuft **nur beim Host**, z. B. alle N Ticks pro Nation (gestaffelt, um Lastspitzen zu vermeiden).
-- Die KI nutzt einen **eigenen Seeded-RNG mit festem Seed**, nicht den Simulations-RNG. Ihr Zustand gehört zum Host-only-Teil des Spielstands ([Entscheidung 0002](decisions/0002-eigener-ki-zufallsgenerator.md)).
+- Die KI nutzt einen **eigenen Seeded-RNG mit festem Seed**, nicht den Simulations-RNG. Der Zustand des KI-RNG ist **nicht Teil des `GameState`**, sondern wird im Host-only-Teil des Spielstands mitgespeichert. Damit hält der Speicher-Hash-Test auch mit KI-Spielern ([Entscheidung 0002](decisions/0002-eigener-ki-zufallsgenerator.md)).
 - Testbar: KI-gegen-KI-Partien headless in xUnit über viele Ticks (Smoke-Test: kein Absturz, KI baut, KI erobert) – dank festem Seed reproduzierbar.
 
 ---
