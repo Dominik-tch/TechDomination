@@ -11,8 +11,13 @@ config_version=5
 [application]
 
 config/name="Tech_Domination"
-config/features=PackedStringArray("4.7", "Forward Plus")
+run/main_scene="res://scenes/Main.tscn"
+config/features=PackedStringArray("4.7", "C#", "Forward Plus")
 config/icon="res://icon.svg"
+
+[autoload]
+
+SimulationDriver="*res://scripts/SimulationDriver.cs"
 
 [display]
 
@@ -22,6 +27,7 @@ window/stretch/aspect="expand"
 [dotnet]
 
 project/assembly_name="Tech_Domination"
+project/solution_directory="../"
 
 [physics]
 
