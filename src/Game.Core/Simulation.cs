@@ -2,15 +2,23 @@ using Game.Core.Commands;
 using Game.Core.Data;
 using Game.Core.Events;
 using Game.Core.State;
+using Game.Core.Systems;
 
 namespace Game.Core;
 
 /// <summary>Führt die Simulation Tick für Tick aus (siehe docs/architecture.md, Abschnitt 4).</summary>
 public static class Simulation
 {
+    // Feste Reihenfolge laut docs/architecture.md, Abschnitt 4.1. Weitere Systeme kommen mit ihren Meilensteinen dazu.
+    private static readonly ISimulationSystem[] Systems =
+    [
+        new ProductionSystem(),
+        new TaxSystem(),
+    ];
+
     /// <summary>
     /// Führt genau einen Tick aus: Commands in fester Reihenfolge (Nation, dann Sequenz) prüfen und anwenden,
-    /// danach den Tick erhöhen. Systeme kommen ab Meilenstein M3 dazu.
+    /// dann die Systeme in fester Reihenfolge ausführen und den Tick erhöhen.
     /// </summary>
     /// <param name="commands">Commands für genau diesen Tick; die Eingabereihenfolge spielt keine Rolle.</param>
     /// <returns>Die Events dieses Ticks.</returns>
@@ -43,6 +51,11 @@ public static class Simulation
             {
                 events.Add(new CommandRejected(state.Tick, envelope, validation.Reason!));
             }
+        }
+
+        foreach (var system in Systems)
+        {
+            system.Update(state, data);
         }
 
         state.Tick++;

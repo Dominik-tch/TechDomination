@@ -17,6 +17,68 @@ public class ResourceAndNationLoadingTests
     }
 
     [Fact]
+    public void Resources_ProductionIsConvertedToThousandths()
+    {
+        var data = TestData.Load();
+
+        Assert.Equal([1500, 250, 0], data.Resources.Select(r => r.ProductionPerInterval));
+    }
+
+    [Fact]
+    public void Resources_BasicWithoutProduction_Throws()
+    {
+        var resources = TestData.Resources();
+        resources["resources"]![0]!.AsObject().Remove("production");
+
+        var error = LoadFails(resources: resources);
+
+        Assert.Contains("Ressource 'wood'", error.Message);
+        Assert.Contains("'production'", error.Message);
+    }
+
+    [Fact]
+    public void Resources_AdvancedWithProduction_Throws()
+    {
+        var resources = TestData.Resources();
+        resources["resources"]![2]!["production"] = 1;
+
+        var error = LoadFails(resources: resources);
+
+        Assert.Contains("Ressource 'rails'", error.Message);
+    }
+
+    [Fact]
+    public void Resources_NegativeProduction_Throws()
+    {
+        var resources = TestData.Resources();
+        resources["resources"]![0]!["production"] = -1;
+
+        var error = LoadFails(resources: resources);
+
+        Assert.Contains("nicht negativ", error.Message);
+    }
+
+    [Fact]
+    public void Resources_ProductionWithTooManyDecimals_Throws()
+    {
+        var resources = TestData.Resources();
+        resources["resources"]![0]!["production"] = JsonNode.Parse("0.0005");
+
+        var error = LoadFails(resources: resources);
+
+        Assert.Contains("zu viele Nachkommastellen (höchstens 3)", error.Message);
+    }
+
+    [Fact]
+    public void Resources_ZeroProduction_IsAllowed()
+    {
+        var resources = TestData.Resources();
+        resources["resources"]![0]!["production"] = 0;
+
+        Assert.Equal(0, GameDataLoader.Load(TestData.Files(resources: resources)).Resources[0].ProductionPerInterval);
+    }
+
+    [Fact]
     public void Nations_AreLoadedInFileOrderWithIds()
     {
         var data = TestData.Load();

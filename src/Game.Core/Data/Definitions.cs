@@ -17,7 +17,20 @@ public sealed record SpeedLevelDefinition(string Key, string Name, int TicksPerS
 
 /// <summary>Ressource aus resources.json.</summary>
 /// <param name="Key">Lesbare ID aus der Datendatei.</param>
-public sealed record ResourceDefinition(ResourceId Id, string Key, string Name, ResourceTier Tier);
+/// <param name="ProductionPerInterval">
+/// Menge, die eine Provinz mit diesem Rohstoff pro Wirtschaftstakt produziert, in Tausendstel.
+/// 0 bei fortgeschrittenen Gütern, die nur in Fabriken entstehen.
+/// </param>
+public sealed record ResourceDefinition(
+    ResourceId Id, string Key, string Name, ResourceTier Tier, long ProductionPerInterval);
+
+/// <summary>Wirtschaftsregeln aus economy.json.</summary>
+/// <param name="IntervalTicks">Alle wie viele Ticks Produktion und Steuern gutgeschrieben werden.</param>
+/// <param name="TaxPerProvince">Steuern pro Provinz und Takt, in Cent.</param>
+/// <param name="StartMoney">Startgeld jeder Nation, in Cent.</param>
+/// <param name="StartResources">Startbestand jeder Nation je Ressource in Tausendstel, Index = <see cref="ResourceId.Value"/>.</param>
+public sealed record EconomyDefinition(
+    int IntervalTicks, long TaxPerProvince, long StartMoney, IReadOnlyList<long> StartResources);
 
 /// <summary>Nation aus nations.json.</summary>
 /// <param name="Key">Lesbare ID aus der Datendatei.</param>

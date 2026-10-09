@@ -2,6 +2,7 @@ using Game.Core;
 using Game.Core.Data;
 using Game.Core.Map;
 using Godot;
+using TechDomination.UI;
 
 namespace TechDomination.Map;
 
@@ -15,6 +16,8 @@ public partial class MapView : Node2D
     private const float SelectionWidth = 5f;
     private const float LabelWidth = 200f;
     private const float LabelHeight = 24f;
+    private const float ResourceIconSize = 28f;
+    private const float ResourceIconOffset = 26f;
 
     private static readonly Color BorderColor = new(0.12f, 0.12f, 0.12f);
     private static readonly Color SelectionColor = new(1f, 0.85f, 0.2f);
@@ -134,6 +137,18 @@ public partial class MapView : Node2D
         label.AddThemeColorOverride("font_outline_color", Colors.Black);
         label.AddThemeConstantOverride("outline_size", 4);
         AddChild(label);
+
+        // Rohstoff-Symbol unter dem Namen.
+        if (Icons.Resource(_driver.Data!.GetResource(province.Resource).Key) is { } icon)
+        {
+            AddChild(new Sprite2D
+            {
+                Texture = icon,
+                Position = new Vector2(province.LabelPosition.X, province.LabelPosition.Y + ResourceIconOffset),
+                Scale = Vector2.One * (ResourceIconSize / icon.GetWidth()),
+                ZIndex = 2,
+            });
+        }
     }
 
     private static Vector2[] ToVectors(IReadOnlyList<MapPoint> points) =>

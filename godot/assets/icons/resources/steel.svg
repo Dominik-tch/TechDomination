@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Stahlbarren (Platzhalter) -->
+  <polygon points="8,44 56,44 48,26 16,26" fill="#9AA4AE" stroke="#2F3A44" stroke-width="3" stroke-linejoin="round"/>
+  <polygon points="16,26 48,26 44,20 20,20" fill="#C9D1D8" stroke="#2F3A44" stroke-width="3" stroke-linejoin="round"/>
+  <line x1="18" y1="36" x2="46" y2="36" stroke="#DDE3E8" stroke-width="2"/>
+</svg>

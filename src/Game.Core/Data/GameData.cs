@@ -6,6 +6,7 @@ public sealed class GameData
     internal GameData(
         IReadOnlyList<SpeedLevelDefinition> speedLevels,
         SpeedLevelDefinition defaultSpeedLevel,
+        EconomyDefinition economy,
         IReadOnlyList<ResourceDefinition> resources,
         IReadOnlyList<NationDefinition> nations,
         IReadOnlyList<ProvinceDefinition> provinces,
@@ -13,6 +14,7 @@ public sealed class GameData
     {
         SpeedLevels = speedLevels;
         DefaultSpeedLevel = defaultSpeedLevel;
+        Economy = economy;
         Resources = resources;
         Nations = nations;
         Provinces = provinces;
@@ -24,6 +26,8 @@ public sealed class GameData
 
     /// <summary>Stufe bei Spielbeginn.</summary>
     public SpeedLevelDefinition DefaultSpeedLevel { get; }
+
+    public EconomyDefinition Economy { get; }
 
     /// <summary>Alle Ressourcen, Index = <see cref="ResourceId.Value"/>.</summary>
     public IReadOnlyList<ResourceDefinition> Resources { get; }

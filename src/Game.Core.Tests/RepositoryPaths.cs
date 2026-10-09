@@ -3,7 +3,9 @@ namespace Game.Core.Tests;
 /// <summary>Findet Verzeichnisse im Repository, unabhängig davon, wo die Tests ausgeführt werden.</summary>
 internal static class RepositoryPaths
 {
-    public static string GodotDataDirectory => Path.Combine(FindRoot(), "godot", "data");
+    public static string GodotDirectory => Path.Combine(FindRoot(), "godot");
+
+    public static string GodotDataDirectory => Path.Combine(GodotDirectory, "data");
 
     private static string FindRoot()
     {

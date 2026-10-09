@@ -66,6 +66,18 @@ public class GameStateSerializerTests
     }
 
     [Fact]
+    public void RoundTrip_PreservesMoneyAndResources()
+    {
+        var state = CreateAdvancedState(seed: 7, ticks: 9);
+
+        var loaded = GameStateSerializer.Deserialize(GameStateSerializer.SerializeToUtf8Bytes(state));
+
+        Assert.Equal(state.Nations.Select(n => n.Money), loaded.Nations.Select(n => n.Money));
+        Assert.Equal(state.Nations.SelectMany(n => n.Resources), loaded.Nations.SelectMany(n => n.Resources));
+        Assert.NotEqual(100_00, loaded.GetNation(TestIds.Red).Money);
+    }
+
+    [Fact]
     public void RoundTrip_ViaStream_ProducesIdenticalJson()
     {
         var state = CreateAdvancedState(seed: 3, ticks: 10);
@@ -89,7 +101,7 @@ public class GameStateSerializerTests
     [Fact]
     public void Deserialize_MissingRng_Throws()
     {
-        byte[] json = Encoding.UTF8.GetBytes("""{ "seed": 1, "tick": 0, "provinces": [] }""");
+        byte[] json = Encoding.UTF8.GetBytes("""{ "seed": 1, "tick": 0, "nations": [], "provinces": [] }""");
 
         Assert.Throws<ArgumentNullException>(() => GameStateSerializer.Deserialize(json));
     }

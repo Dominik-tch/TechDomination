@@ -1,0 +1,11 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/ResourceBar.cs" id="1_bar"]
+
+[node name="ResourceBar" type="HBoxContainer"]
+offset_left = 16.0
+offset_top = 44.0
+offset_right = 716.0
+offset_bottom = 72.0
+theme_override_constants/separation = 16
+script = ExtResource("1_bar")

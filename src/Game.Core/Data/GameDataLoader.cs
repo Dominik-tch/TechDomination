@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -19,6 +20,7 @@ public static class GameDataLoader
     public const string ResourcesFileName = "resources.json";
     public const string NationsFileName = "nations.json";
     public const string MapFileName = "map.json";
+    public const string EconomyFileName = "economy.json";
 
     // Technische Obergrenze, kein Balancing-Wert.
     private const int MaxTicksPerSecond = 1000;
@@ -40,8 +42,10 @@ public static class GameDataLoader
         var resources = LoadResources(Parse<ResourcesFile>(files, ResourcesFileName));
         var nations = LoadNations(Parse<NationsFile>(files, NationsFileName));
         var provinces = LoadProvinces(Parse<MapFile>(files, MapFileName), resources, nations);
+        var economy = LoadEconomy(Parse<EconomyFile>(files, EconomyFileName), resources);
 
-        return new GameData(speedLevels, defaultSpeedLevel, resources, nations, provinces, ComputeContentHash(files));
+        return new GameData(
+            speedLevels, defaultSpeedLevel, economy, resources, nations, provinces, ComputeContentHash(files));
     }
 
     /// <summary>
@@ -113,10 +117,61 @@ public static class GameDataLoader
                     $"Ressource '{key}': 'tier' muss \"basic\" oder \"advanced\" sein, ist aber \"{entry.Tier}\"."),
             };
 
-            resources.Add(new ResourceDefinition(new ResourceId(resources.Count), key, name, tier));
+            long production = tier switch
+            {
+                ResourceTier.Basic => RequireAmount(
+                    entry.Production, Quantities.ResourceScale, ResourcesFileName, $"Ressource '{key}'", "production"),
+                _ when entry.Production is not null => throw Error(
+                    ResourcesFileName,
+                    $"Ressource '{key}': Fortgeschrittene Güter werden nicht von Provinzen produziert und haben kein 'production'."),
+                _ => 0,
+            };
+
+            resources.Add(new ResourceDefinition(new ResourceId(resources.Count), key, name, tier, production));
         }
 
         return resources;
+    }
+
+    private static EconomyDefinition LoadEconomy(EconomyFile file, IReadOnlyList<ResourceDefinition> resources)
+    {
+        const string context = "Datei";
+
+        int intervalTicks = file.IntervalTicks ?? throw Error(EconomyFileName, "Feld 'intervalTicks' fehlt.");
+        if (intervalTicks < 1)
+        {
+            throw Error(EconomyFileName, $"'intervalTicks' muss mindestens 1 sein, ist aber {intervalTicks}.");
+        }
+
+        long taxPerProvince = RequireAmount(file.TaxPerProvince, Quantities.MoneyScale, EconomyFileName, context, "taxPerProvince");
+        long startMoney = RequireAmount(file.StartMoney, Quantities.MoneyScale, EconomyFileName, context, "startMoney");
+
+        // Fehlende Ressourcen starten mit 0; unbekannte sind ein Tippfehler.
+        var startResources = new long[resources.Count];
+        foreach (var (resourceKey, amount) in file.StartResources ?? [])
+        {
+            var resource = resources.FirstOrDefault(r => r.Key == resourceKey)
+                ?? throw Error(EconomyFileName, $"'startResources' enthält unbekannte Ressource '{resourceKey}'.");
+            startResources[resource.Id.Value] = RequireAmount(
+                amount, Quantities.ResourceScale, EconomyFileName, "'startResources'", resourceKey);
+        }
+
+        return new EconomyDefinition(intervalTicks, taxPerProvince, startMoney, startResources);
+    }
+
+    /// <summary>Pflichtfeld mit nicht-negativer Dezimalzahl, exakt umgerechnet in die Untereinheit.</summary>
+    private static long RequireAmount(decimal? value, long scale, string fileName, string context, string field)
+    {
+        decimal amount = value ?? throw Error(fileName, $"{context}: Feld '{field}' fehlt.");
+        if (amount < 0)
+        {
+            throw Error(fileName, $"{context}: '{field}' darf nicht negativ sein, ist aber {amount}.");
+        }
+
+        return Quantities.ToFixed(amount, scale)
+            ?? throw Error(
+                fileName,
+                $"{context}: '{field}' = {amount} hat zu viele Nachkommastellen (höchstens {scale.ToString(CultureInfo.InvariantCulture).Length - 1}).");
     }
 
     private static List<NationDefinition> LoadNations(NationsFile file)

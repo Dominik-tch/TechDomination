@@ -90,7 +90,8 @@ Der Inhalt wächst mit den Meilensteinen; die Tabelle ist der Zielstand für das
 
 - **IDs:** typisierte Ganzzahl-IDs (`ProvinceId`, `NationId`, `ArmyId`), vergeben über Zähler im Zustand.
 - **Sammlungen:** Listen sortiert nach ID bzw. `SortedDictionary`. Keine Logik, die von der Iterationsreihenfolge eines `Dictionary`/`HashSet` abhängt.
-- **Zahlen:** keine `float`/`double` in der Simulation. Mengen und Preise als Ganzzahlen in festen Untereinheiten (z. B. Ressourcen in 1/1000, Geld in Cent).
+- **Zahlen:** keine `float`/`double` in der Simulation. Ressourcenmengen als `long` in Tausendstel, Geld als `long` in Cent. In den Datendateien stehen lesbare Dezimalzahlen (`0.5`, `12.25`); der Lader rechnet sie exakt um und lehnt zu viele Nachkommastellen ab.
+- **Wirtschaftstakt:** Produktion und Steuern werden alle `intervalTicks` Ticks gutgeschrieben (aus `economy.json`), nicht in jedem Tick. Alle Mengen in den Daten gelten pro Takt.
 - **Zufall:** eigener kleiner PRNG (z. B. PCG/xorshift) mit Zustand im `GameState`. Nicht `System.Random`, da dessen Zustand nicht serialisierbar und dessen Algorithmus nicht garantiert stabil ist.
 - **Schreibschutz für Godot:** Zustandsklassen haben öffentliche Getter und `internal` Setter. Godot (andere Assembly) kann damit nur lesen; der Compiler erzwingt, dass Änderungen nur über Commands laufen. Tests bekommen `InternalsVisibleTo`.
 
@@ -296,10 +297,10 @@ Jeder Meilenstein endet mit grünem `dotnet test` und ist entweder in Godot spie
 |---|---|---|---|
 | **M0** | Gerüst | Solution, Game.Core, Tests, Godot-Projekt mit Referenz auf Core. Leerer `GameState`, `Step()` erhöht Tick. RNG, Zustands-Hash, JSON-Serialisierung. Datenlader, der Inhalt entgegennimmt; Godot liest `res://data/`. | Tests: Determinismus-Hash, Serialisierungs-Roundtrip. Godot zeigt laufenden Tickzähler. |
 | **M1** | Karte & Provinzen | Kartenformat in `godot/data/`, kleine **Testkarte** (~10 Provinzen). Provinzen mit Besitzer, Größe, Rohstoff, Nachbarn. Darstellung, Klick, Besitzerfarbe, Info-Panel. | Feature 1 (mit Testkarte). Tests: Daten laden/validieren, Nachbarschaft. |
-| **M2** | Zeit & Commands lokal | Command-Pipeline (Envelope, Validate/Apply, Queue, Ablehnung), Session mit Pause & Geschwindigkeitsstufen, `SimulationDriver`. `ICommandSink` folgt mit dem ersten echten Command (M3), `IGameStateSource` mit dem Multiplayer (M11). | Spielbar: pausieren, Tempo wechseln. Tests: Command-Reihenfolge, ungültige Commands. |
-| **M3** | Wirtschaft I | Basis-Produktion, nationaler Pool, Steuern, Geld. Ressourcenleiste im UI. | Spielbar: Pool wächst. Tests: Produktion/Steuern über N Ticks. |
+| **M2** | Zeit & Commands lokal | Command-Pipeline (Envelope, Validate/Apply, Queue, Ablehnung), Session mit Pause & Geschwindigkeitsstufen, `SimulationDriver`. `ICommandSink` folgt mit dem ersten echten Command (M5), `IGameStateSource` mit dem Multiplayer (M11). | Spielbar: pausieren, Tempo wechseln. Tests: Command-Reihenfolge, ungültige Commands. |
+| **M3** | Wirtschaft I | Basis-Produktion, nationaler Pool, Steuern, Geld, Startwerte, Wirtschaftstakt. Ressourcenleiste und Rohstoff-Symbole auf der Karte. | Spielbar: Pool wächst. Tests: Produktion/Steuern über N Ticks. |
 | **M4** | Speichern/Laden lokal | `SaveGame`, Versionierung, Kompression, Speichern/Laden-Menü. Bewusst früh, damit jedes weitere Feature sofort speicherbar bleibt. | Kerntest „speichern-laden ≡ durchlaufen“. Spielbar: speichern, beenden, fortsetzen. |
-| **M5** | Gebäude | Bau, Bauzeit, Ausbaustufen, Wirkung (z. B. Produktionsbonus), Kosten. | Feature 4. |
+| **M5** | Gebäude | Bau, Bauzeit, Ausbaustufen, Wirkung (Produktionsbonus), Kosten. Erster Spieler-Command, `ICommandSink`. | Feature 4. |
 | **M6** | Wirtschaft II | Fabriken mit Rezepten, Markt (Kauf/Verkauf, Preisanstieg, Erholung), fortgeschrittene Güter, ~25 Ressourcen in `godot/data/`. | Feature 3 vollständig. |
 | **M7** | Armeen & Bewegung | Rekrutieren (kostet Güter), gemischte Stacks, Zusammenlegen/Teilen, Pfadsuche, Bewegung nach Provinzgröße und Einheitentyp, Interpolation zwischen Ticks. | Spielbar: Armeen über die Karte ziehen. Tests: Bewegungsdauer, Pfad. |
 | **M8** | Krieg & Kampf | Diplomatie (Krieg/Frieden), automatischer Kampf in Runden, Eroberung durch Einmarsch. | Features 5 + 6. Spielbar im Sandbox-Modus mit mehreren lokal umschaltbaren Nationen. |

@@ -51,6 +51,40 @@ public class GameStateFactoryTests
         };
 
         Assert.Throws<ArgumentException>(
-            () => new GameState(1, 0, Game.Core.Determinism.DeterministicRandom.FromSeed(1), provinces));
+            () => new GameState(1, 0, Game.Core.Determinism.DeterministicRandom.FromSeed(1), [], provinces));
+    }
+
+    [Fact]
+    public void Constructor_RejectsUnsortedNations()
+    {
+        var nations = new List<NationState> { new(new NationId(1), 0, []), new(new NationId(0), 0, []) };
+
+        Assert.Throws<ArgumentException>(
+            () => new GameState(1, 0, Game.Core.Determinism.DeterministicRandom.FromSeed(1), nations, []));
+    }
+
+    [Fact]
+    public void CreateNew_GivesEveryNationStartMoneyAndResources()
+    {
+        var data = TestData.Load();
+
+        var state = GameStateFactory.CreateNew(data, seed: 1);
+
+        Assert.Equal(data.Nations.Select(n => n.Id), state.Nations.Select(n => n.Id));
+        Assert.All(state.Nations, nation =>
+        {
+            Assert.Equal(100_00, nation.Money);
+            Assert.Equal([10_000, 500, 0], nation.Resources);
+        });
+    }
+
+    [Fact]
+    public void CreateNew_NationsDoNotShareResourceArrays()
+    {
+        var state = GameStateFactory.CreateNew(TestData.Load(), seed: 1);
+
+        state.GetNation(TestIds.Red).AddResource(new ResourceId(0), 1);
+
+        Assert.Equal(10_000, state.GetNation(TestIds.Blue).GetResource(new ResourceId(0)));
     }
 }

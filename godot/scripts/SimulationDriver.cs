@@ -28,6 +28,9 @@ public partial class SimulationDriver : Node
     /// <summary>Der Spieler an diesem Rechner. Im Einzelspieler ist er zugleich der Host.</summary>
     public PlayerId LocalPlayer { get; } = new(0);
 
+    /// <summary>Die Nation des lokalen Spielers. Vorerst die erste Nation, bis das Spielstart-Setup (M9) die Wahl erlaubt.</summary>
+    public NationId LocalNation { get; } = new(0);
+
     public GameData? Data => Session?.Data;
 
     public GameState? State => Session?.State;

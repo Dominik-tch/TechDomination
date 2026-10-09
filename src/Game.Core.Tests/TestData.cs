@@ -9,7 +9,8 @@ namespace Game.Core.Tests;
 /// </summary>
 /// <remarks>
 /// Testkarte: drei Provinzen in einer Reihe, a | b | c, je 10×10 Einheiten.
-/// a gehört "red", b und c gehören "blue".
+/// a gehört "red", b und c gehören "blue". a und c produzieren Holz (1,5/Takt), b Fisch (0,25/Takt).
+/// Wirtschaftstakt: 4 Ticks, Steuern 2,50 pro Provinz und Takt.
 /// </remarks>
 internal static class TestData
 {
@@ -27,8 +28,8 @@ internal static class TestData
     public static JsonObject Resources() => Parse("""
         {
           "resources": [
-            { "id": "wood", "name": "Holz", "tier": "basic" },
-            { "id": "fish", "name": "Fisch", "tier": "basic" },
+            { "id": "wood", "name": "Holz", "tier": "basic", "production": 1.5 },
+            { "id": "fish", "name": "Fisch", "tier": "basic", "production": 0.25 },
             { "id": "rails", "name": "Schienen", "tier": "advanced" }
           ]
         }
@@ -62,17 +63,28 @@ internal static class TestData
         }
         """);
 
+    public static JsonObject Economy() => Parse("""
+        {
+          "intervalTicks": 4,
+          "taxPerProvince": 2.5,
+          "startMoney": 100,
+          "startResources": { "wood": 10, "fish": 0.5 }
+        }
+        """);
+
     /// <summary>Alle Datendateien; nicht übergebene Teile werden mit den Standard-Testdaten gefüllt.</summary>
     public static Dictionary<string, string> Files(
         JsonObject? simulation = null,
         JsonObject? resources = null,
         JsonObject? nations = null,
-        JsonObject? map = null) => new(StringComparer.Ordinal)
+        JsonObject? map = null,
+        JsonObject? economy = null) => new(StringComparer.Ordinal)
     {
         [GameDataLoader.SimulationFileName] = (simulation ?? Simulation()).ToJsonString(),
         [GameDataLoader.ResourcesFileName] = (resources ?? Resources()).ToJsonString(),
         [GameDataLoader.NationsFileName] = (nations ?? Nations()).ToJsonString(),
         [GameDataLoader.MapFileName] = (map ?? Map()).ToJsonString(),
+        [GameDataLoader.EconomyFileName] = (economy ?? Economy()).ToJsonString(),
     };
 
     public static GameData Load() => GameDataLoader.Load(Files());

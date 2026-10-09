@@ -1,13 +1,15 @@
 {
   // Basis-Rohstoffe: jede Provinz produziert genau einen davon.
-  // Fortgeschrittene Güter ("tier": "advanced") kommen mit Meilenstein M6 dazu.
+  // "production" = Menge pro Provinz und Wirtschaftstakt (siehe economy.json), unabhängig von der Provinzgröße.
+  // Fortgeschrittene Güter ("tier": "advanced") kommen mit Meilenstein M6 dazu und haben kein "production".
+  // Werte sind Platzhalter fürs Balancing.
   "resources": [
-    { "id": "wood", "name": "Holz", "tier": "basic" },
-    { "id": "steel", "name": "Stahl", "tier": "basic" },
-    { "id": "grain", "name": "Getreide", "tier": "basic" },
-    { "id": "fish", "name": "Fisch", "tier": "basic" },
-    { "id": "gas", "name": "Gas", "tier": "basic" },
-    { "id": "coal", "name": "Kohle", "tier": "basic" },
-    { "id": "oil", "name": "Öl", "tier": "basic" }
+    { "id": "wood", "name": "Holz", "tier": "basic", "production": 1 },
+    { "id": "steel", "name": "Stahl", "tier": "basic", "production": 1 },
+    { "id": "grain", "name": "Getreide", "tier": "basic", "production": 1 },
+    { "id": "fish", "name": "Fisch", "tier": "basic", "production": 1 },
+    { "id": "gas", "name": "Gas", "tier": "basic", "production": 1 },
+    { "id": "coal", "name": "Kohle", "tier": "basic", "production": 1 },
+    { "id": "oil", "name": "Öl", "tier": "basic", "production": 1 }
   ]
 }

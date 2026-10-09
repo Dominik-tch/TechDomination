@@ -31,6 +31,19 @@ internal sealed class ResourceEntry
     public string? Name { get; set; }
 
     public string? Tier { get; set; }
+
+    public decimal? Production { get; set; }
+}
+
+internal sealed class EconomyFile
+{
+    public int? IntervalTicks { get; set; }
+
+    public decimal? TaxPerProvince { get; set; }
+
+    public decimal? StartMoney { get; set; }
+
+    public Dictionary<string, decimal>? StartResources { get; set; }
 }
 
 internal sealed class NationsFile

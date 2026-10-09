@@ -1,4 +1,5 @@
 using Game.Core;
+using Game.Core.Economy;
 using Godot;
 
 namespace TechDomination.UI;
@@ -35,15 +36,19 @@ public partial class ProvinceInfoPanel : PanelContainer
 
     private void Refresh()
     {
-        if (_province is not { } id || _driver.Data is not { } data || _driver.State is not { } state)
+        if (_province is not { } id || _driver.Session is not { } session)
         {
             return;
         }
 
+        var data = session.Data;
+        var state = session.State;
+
         var province = data.GetProvince(id);
         _nameLabel.Text = province.Name;
         _ownerLabel.Text = $"Besitzer: {data.GetNation(state.GetProvince(id).Owner).Name}";
-        _resourceLabel.Text = $"Rohstoff: {data.GetResource(province.Resource).Name}";
+        long perMinute = UiFormat.PerMinute(EconomyRules.ProductionPerInterval(data, province), session);
+        _resourceLabel.Text = $"Rohstoff: {data.GetResource(province.Resource).Name} ({UiFormat.Signed(UiFormat.Resource(perMinute), perMinute)}/min)";
 
         // Gebäude kommen mit Meilenstein M5.
         _buildingsLabel.Text = "Gebäude: keine";

@@ -1,0 +1,20 @@
+{
+  // Wirtschaftsregeln. Alle Werte sind Platzhalter fürs Balancing.
+  // Produktion und Steuern werden alle "intervalTicks" Ticks gutgeschrieben (10 Ticks = 1 Sekunde bei "normal").
+  "intervalTicks": 10,
+
+  // Geld pro Provinz und Takt, unabhängig von der Provinzgröße. Höchstens 2 Nachkommastellen.
+  "taxPerProvince": 2.5,
+
+  // Jede Nation startet mit diesen Beständen. Ressourcen höchstens 3 Nachkommastellen.
+  "startMoney": 500,
+  "startResources": {
+    "wood": 50,
+    "steel": 50,
+    "grain": 50,
+    "fish": 50,
+    "gas": 50,
+    "coal": 50,
+    "oil": 50
+  }
+}

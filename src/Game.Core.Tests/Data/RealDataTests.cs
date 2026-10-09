@@ -41,6 +41,20 @@ public class RealDataTests
         }
     }
 
+    [Fact]
+    public void EveryBasicResource_HasMapIcon()
+    {
+        // Godot lädt res://assets/icons/resources/<id>.svg; ohne Symbol fehlt der Rohstoff auf der Karte.
+        string iconDirectory = Path.Combine(RepositoryPaths.GodotDirectory, "assets", "icons", "resources");
+
+        foreach (var resource in _data.Resources.Where(r => r.Tier == ResourceTier.Basic))
+        {
+            Assert.True(
+                File.Exists(Path.Combine(iconDirectory, $"{resource.Key}.svg")),
+                $"Symbol für Rohstoff '{resource.Key}' fehlt.");
+        }
+    }
+
     private static Dictionary<string, string> ReadGodotDataFiles() =>
         Directory.GetFiles(RepositoryPaths.GodotDataDirectory, "*.json")
             .ToDictionary(path => Path.GetFileName(path), File.ReadAllText, StringComparer.Ordinal);

@@ -34,10 +34,12 @@ Die Simulation läuft in Ticks. Es gibt mehrere Geschwindigkeitsstufen.
 
 ### 3. Wirtschaft
 - Ca. 25 Ressourcen in zwei Stufen:
-  - **Basis-Rohstoffe** (z. B. Holz, Stahl, Getreide, Fisch, Gas, Kohle, Öl), jede Provinz produziert einen.
+  - **Basis-Rohstoffe** (z. B. Holz, Stahl, Getreide, Fisch, Gas, Kohle, Öl), jede Provinz produziert genau einen. Der Rohstoff einer Provinz wird auf der Karte durch ein Symbol dargestellt (z. B. Holzstamm, Ölfass).
   - **Fortgeschrittene Güter** (z. B. Schienen, Motoren, Flügel, Sättel), herstellbar in spezifischen Fabriken nach Rezept (z. B. 2 Stahl + 5 Holz → 1 Schiene) oder kaufbar.
 - Alle Ressourcen liegen in einem **nationalen Pool** und sind überall sofort verfügbar.
-- **Geld** kommt aus Steuern pro Provinz und aus dem Verkauf von Ressourcen.
+- **Produktion:** feste Menge je Rohstoff, unabhängig von der Provinzgröße. Bestimmte Gebäude können später den Rohstoff-Output erhöhen.
+- **Geld** kommt aus Steuern pro Provinz und aus dem Verkauf von Ressourcen. Steuern sind ein fester Betrag pro Provinz, unabhängig von der Provinzgröße; Gebäude erhöhen die Steuern nicht.
+- **Start:** Jede Nation beginnt mit einem festen Startbetrag an Geld und an Rohstoffen (Werte in den Daten).
 - **Markt:** Jeder Spieler hat einen eigenen Markt, der nur von seinen eigenen Käufen und Verkäufen abhängt. Kaufen erhöht den Preis der Ressource, der Preis sinkt danach langsam zum Basispreis zurück.
 - Konkrete Ressourcen, Rezepte und Preise stehen in separaten Daten-/Konfigurationsdateien, nicht in diesem Dokument.
 
@@ -107,6 +109,7 @@ Diese Punkte werden bewusst **nicht** gebaut, solange sie nicht hier ergänzt we
 - Kein Ressourcentransport zwischen Provinzen (nationaler Pool)
 - Keine Bündnisse oder weitere Diplomatie über Krieg/Frieden hinaus
 - Kein direkter Handel zwischen Spielern im MVP
+- Keine Bevölkerung und keine Moral im MVP
 
 ## Annahmen (zu bestätigen)
 
@@ -117,8 +120,6 @@ Diese Punkte werden bewusst **nicht** gebaut, solange sie nicht hier ergänzt we
 ## Offene Fragen
 
 - Welche Landeinheiten gibt es im MVP?
-- Wovon hängen Steuern ab (pauschal pro Provinz, Gebäude, Bevölkerung)?
-- Gibt es Bevölkerung oder Moral?
 - Wie viele Provinzen hat die Europakarte?
-- Startbedingungen: Nationenwahl, Startressourcen, Startarmeen?
+- Startbedingungen: Nationenwahl, Startarmeen?
 - Was passiert mit Truppen in fremdem Gebiet bei Friedensschluss?
