@@ -13,7 +13,16 @@ namespace Game.Core.Tests;
 /// </remarks>
 internal static class TestData
 {
-    public static JsonObject Simulation(int ticksPerSecond = 10) => new() { ["ticksPerSecond"] = ticksPerSecond };
+    public static JsonObject Simulation() => Parse("""
+        {
+          "speedLevels": [
+            { "id": "slow", "name": "Langsam", "ticksPerSecond": 5 },
+            { "id": "normal", "name": "Normal", "ticksPerSecond": 10 },
+            { "id": "fast", "name": "Schnell", "ticksPerSecond": 20 }
+          ],
+          "defaultSpeedLevel": "normal"
+        }
+        """);
 
     public static JsonObject Resources() => Parse("""
         {

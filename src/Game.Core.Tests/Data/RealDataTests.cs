@@ -12,7 +12,7 @@ public class RealDataTests
     [Fact]
     public void Load_Succeeds()
     {
-        Assert.True(_data.TicksPerSecond > 0);
+        Assert.NotEmpty(_data.SpeedLevels);
         Assert.NotEmpty(_data.Provinces);
         Assert.NotEmpty(_data.Nations);
     }

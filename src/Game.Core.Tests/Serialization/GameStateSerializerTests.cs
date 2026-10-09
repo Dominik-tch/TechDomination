@@ -100,7 +100,7 @@ public class GameStateSerializerTests
         var state = GameStateFactory.CreateNew(data, seed);
         for (int i = 0; i < ticks; i++)
         {
-            Simulation.Step(state, data);
+            Simulation.Step(state, data, []);
             state.Rng.NextUInt();
         }
 

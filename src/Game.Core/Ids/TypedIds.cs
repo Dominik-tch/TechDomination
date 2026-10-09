@@ -39,6 +39,15 @@ public readonly record struct ResourceId(int Value) : ITypedId<ResourceId>
     public override string ToString() => $"Resource#{Value}";
 }
 
+/// <summary>Ein Spieler in der Session (Mensch am Host oder Client). Nicht dasselbe wie die Nation, die er steuert.</summary>
+[JsonConverter(typeof(TypedIdJsonConverter<PlayerId>))]
+public readonly record struct PlayerId(int Value) : ITypedId<PlayerId>
+{
+    public static PlayerId FromValue(int value) => new(value);
+
+    public override string ToString() => $"Player#{Value}";
+}
+
 /// <summary>Serialisiert typisierte IDs als einfache Zahl statt als Objekt.</summary>
 internal sealed class TypedIdJsonConverter<T> : JsonConverter<T>
     where T : struct, ITypedId<T>

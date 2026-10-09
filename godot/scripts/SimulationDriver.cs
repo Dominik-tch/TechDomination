@@ -1,12 +1,14 @@
 using Game.Core;
 using Game.Core.Data;
+using Game.Core.Events;
+using Game.Core.Session;
 using Game.Core.State;
 using Godot;
 
 namespace TechDomination;
 
 /// <summary>
-/// Autoload: lädt das Regelwerk aus res://data/, hält den Spielzustand und rechnet Echtzeit in Ticks um.
+/// Autoload: lädt das Regelwerk aus res://data/, hält die Session und rechnet Echtzeit in Ticks um.
 /// Läuft nur beim Host bzw. im Einzelspieler (siehe docs/architecture.md, Abschnitt 4.2).
 /// </summary>
 public partial class SimulationDriver : Node
@@ -21,15 +23,21 @@ public partial class SimulationDriver : Node
 
     private double _pendingTicks;
 
-    public GameData? Data { get; private set; }
+    public GameSession? Session { get; private set; }
 
-    public GameState? State { get; private set; }
+    /// <summary>Der Spieler an diesem Rechner. Im Einzelspieler ist er zugleich der Host.</summary>
+    public PlayerId LocalPlayer { get; } = new(0);
+
+    public GameData? Data => Session?.Data;
+
+    public GameState? State => Session?.State;
 
     public override void _Ready()
     {
+        GameData data;
         try
         {
-            Data = GameDataLoader.Load(ReadDataFiles());
+            data = GameDataLoader.Load(ReadDataFiles());
         }
         catch (GameDataException e)
         {
@@ -38,23 +46,30 @@ public partial class SimulationDriver : Node
             return;
         }
 
-        State = GameStateFactory.CreateNew(Data, DefaultSeed);
+        Session = new GameSession(data, GameStateFactory.CreateNew(data, DefaultSeed), host: LocalPlayer);
     }
 
     public override void _Process(double delta)
     {
-        if (Data is null || State is null)
+        if (Session is null)
         {
             return;
         }
 
-        _pendingTicks += delta * Data.TicksPerSecond;
+        if (Session.IsPaused)
+        {
+            // Während der Pause keine Zeit ansammeln, sonst springt das Spiel beim Fortsetzen.
+            _pendingTicks = 0;
+            return;
+        }
+
+        _pendingTicks += delta * Session.Speed.TicksPerSecond;
         int ticks = (int)_pendingTicks;
         _pendingTicks -= ticks;
 
         for (int i = 0; i < Math.Min(ticks, MaxTicksPerFrame); i++)
         {
-            Simulation.Step(State, Data);
+            ReportEvents(Session.Advance());
         }
     }
 
@@ -63,6 +78,15 @@ public partial class SimulationDriver : Node
         if (State is not null)
         {
             GD.Print($"SimulationDriver beendet bei Tick {State.Tick}.");
+        }
+    }
+
+    // Bis es Benachrichtigungen in der UI gibt, landen abgelehnte Commands im Log.
+    private static void ReportEvents(IReadOnlyList<GameEvent> events)
+    {
+        foreach (var rejected in events.OfType<CommandRejected>())
+        {
+            GD.PushWarning($"Command abgelehnt (Tick {rejected.Tick}): {rejected.Envelope.Command} – {rejected.Reason}");
         }
     }
 

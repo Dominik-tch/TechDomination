@@ -134,7 +134,10 @@ Der Inhalt wächst mit den Meilensteinen; die Tabelle ist der Zielstand für das
 
 - **Command:** reiner, serialisierbarer Datensatz (Record), z. B. `BuildBuilding(provinceId, buildingType)`.
 - **Envelope:** `CommandEnvelope { ExecuteAtTick, Issuer (NationId), Sequence, Command }`. Der **Issuer wird vom Host gesetzt** (aus der Verbindung), nie vom Client übernommen.
-- **Handler:** pro Command-Typ ein Handler mit `Validate(state, data, issuer)` und `Apply(state, data, issuer)`. `Apply` setzt erfolgreiche Validierung voraus und wird nur innerhalb von `Step()` aufgerufen.
+- **Validate / Apply:** Jeder Command-Typ bringt beide Methoden selbst mit ([Entscheidung 0004](decisions/0004-command-validate-apply.md)).
+  - `Validate(state, data, issuer)` ist **öffentlich**, liest nur und liefert ein `ValidationResult` – bei Ungültigkeit mit Grund (z. B. „Nicht genug Stahl“). UI und KI nutzen es, um vorab zu prüfen, ob eine Aktion möglich ist.
+  - `Apply(state, data, issuer)` ist **`internal`**, setzt erfolgreiche Validierung voraus und wird nur innerhalb von `Step()` aufgerufen. Dadurch kann außerhalb von Core weder der Zustand verändert noch ein eigener Command-Typ definiert werden.
+  - `Step()` validiert jeden Command unmittelbar vor der Ausführung erneut, denn der Zustand kann sich seit der Vorab-Prüfung geändert haben.
 - Polymorphe Serialisierung über `System.Text.Json`-Typdiskriminatoren.
 - **Command-Log:** Der Host kann alle ausgeführten Envelopes protokollieren. Zusammen mit einem Spielstand lässt sich damit jede Partie für Tests und Fehlersuche exakt nachspielen.
 
@@ -149,7 +152,7 @@ Der Inhalt wächst mit den Meilensteinen; die Tabelle ist der Zielstand für das
 
 ### 5.3 Session-Commands (nicht Teil der Simulation)
 
-Pause, Fortsetzen, Geschwindigkeit setzen (nur Host), Nation durch KI ersetzen (nur Host), Nation zurückübernehmen. Diese ändern nicht `GameState`, sondern steuern, **ob und wie schnell** Ticks laufen bzw. wer Commands für eine Nation erzeugt.
+Pause und Fortsetzen (jeder Spieler), Geschwindigkeit setzen (nur Host), Nation durch KI ersetzen (nur Host), Nation zurückübernehmen. Diese ändern nicht `GameState`, sondern steuern, **ob und wie schnell** Ticks laufen bzw. wer Commands für eine Nation erzeugt.
 
 ### 5.4 Wer erzeugt Commands?
 
@@ -228,7 +231,7 @@ Entscheidung und Begründung: [0001 – Snapshot-Sync statt Command-Relay](decis
 | Client → Host | `Hello` | Spielversion, Regelwerk-Hash, Spielername |
 | Host → Client | `Welcome` / `Rejected` | zugewiesene Nation bzw. Ablehnungsgrund |
 | Client → Host | `SubmitCommand` | Command + Client-Sequenznummer |
-| Client → Host | `SessionRequest` | Pause, Fortsetzen, Tempo (nur Host), Nation zurückübernehmen |
+| Client → Host | `SessionRequest` | Pause, Fortsetzen (jeder), Tempo (nur Host), Nation zurückübernehmen |
 | Host → Client | `StateUpdate` | Tick, vollständiger komprimierter `GameState`, Session-Status, Events seit dem letzten Update |
 | Host → Client | `CommandRejected` | Client-Sequenznummer + Grund |
 
@@ -293,7 +296,7 @@ Jeder Meilenstein endet mit grünem `dotnet test` und ist entweder in Godot spie
 |---|---|---|---|
 | **M0** | Gerüst | Solution, Game.Core, Tests, Godot-Projekt mit Referenz auf Core. Leerer `GameState`, `Step()` erhöht Tick. RNG, Zustands-Hash, JSON-Serialisierung. Datenlader, der Inhalt entgegennimmt; Godot liest `res://data/`. | Tests: Determinismus-Hash, Serialisierungs-Roundtrip. Godot zeigt laufenden Tickzähler. |
 | **M1** | Karte & Provinzen | Kartenformat in `godot/data/`, kleine **Testkarte** (~10 Provinzen). Provinzen mit Besitzer, Größe, Rohstoff, Nachbarn. Darstellung, Klick, Besitzerfarbe, Info-Panel. | Feature 1 (mit Testkarte). Tests: Daten laden/validieren, Nachbarschaft. |
-| **M2** | Zeit & Commands lokal | Command-Pipeline (Envelope, Handler, Queue, Ablehnung), Session mit Pause & Geschwindigkeitsstufen, `SimulationDriver`, `IGameStateSource`. | Spielbar: pausieren, Tempo wechseln. Tests: Command-Reihenfolge, ungültige Commands. |
+| **M2** | Zeit & Commands lokal | Command-Pipeline (Envelope, Validate/Apply, Queue, Ablehnung), Session mit Pause & Geschwindigkeitsstufen, `SimulationDriver`. `ICommandSink` folgt mit dem ersten echten Command (M3), `IGameStateSource` mit dem Multiplayer (M11). | Spielbar: pausieren, Tempo wechseln. Tests: Command-Reihenfolge, ungültige Commands. |
 | **M3** | Wirtschaft I | Basis-Produktion, nationaler Pool, Steuern, Geld. Ressourcenleiste im UI. | Spielbar: Pool wächst. Tests: Produktion/Steuern über N Ticks. |
 | **M4** | Speichern/Laden lokal | `SaveGame`, Versionierung, Kompression, Speichern/Laden-Menü. Bewusst früh, damit jedes weitere Feature sofort speicherbar bleibt. | Kerntest „speichern-laden ≡ durchlaufen“. Spielbar: speichern, beenden, fortsetzen. |
 | **M5** | Gebäude | Bau, Bauzeit, Ausbaustufen, Wirkung (z. B. Produktionsbonus), Kosten. | Feature 4. |
@@ -317,7 +320,6 @@ Aus den offenen Fragen in `requirements.md` – spätestens im genannten Meilens
 | Frage | Betrifft | Spätestens |
 |---|---|---|
 | Anzahl Provinzen der Europakarte | Data | M13 |
-| Wer darf eine Pause aufheben? | Session | M2 |
 | Wovon hängen Steuern ab? Bevölkerung/Moral? | State, Systems | M3 |
 | Welche Landeinheiten? | Data | M7 |
 | Friedensschluss einseitig oder mit Zustimmung? Truppen in fremdem Gebiet bei Frieden? | Commands, Systems | M8 |
@@ -329,4 +331,5 @@ Aus den offenen Fragen in `requirements.md` – spätestens im genannten Meilens
 | Frage | Entscheidung | Wann |
 |---|---|---|
 | Kartenformat / Provinz-Picking | Polygone in `map.json`, Picking in Core | M1 |
+| Wer darf eine Pause aufheben? | Jeder Spieler. Das Tempo ändert nur der Host | M2 |
 | Seeverbindungen | Keine. Nachbarschaft gibt es nur über Land; Inseln ohne Landnachbarn sind für Landeinheiten nicht erreichbar | M1 |

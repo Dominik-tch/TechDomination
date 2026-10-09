@@ -5,6 +5,17 @@ namespace Game.Core.Data;
 
 internal sealed class SimulationFile
 {
+    public List<SpeedLevelEntry?>? SpeedLevels { get; set; }
+
+    public string? DefaultSpeedLevel { get; set; }
+}
+
+internal sealed class SpeedLevelEntry
+{
+    public string? Id { get; set; }
+
+    public string? Name { get; set; }
+
     public int? TicksPerSecond { get; set; }
 }
 

@@ -1,3 +1,10 @@
 {
-  "ticksPerSecond": 10
+  // Geschwindigkeitsstufen. Ticks pro Sekunde sind Platzhalter fürs Balancing.
+  // Ziel laut Anforderungen: Infanterie braucht bei "normal" im Schnitt 4–5 Minuten pro Provinz.
+  "speedLevels": [
+    { "id": "slow", "name": "Langsam", "ticksPerSecond": 5 },
+    { "id": "normal", "name": "Normal", "ticksPerSecond": 10 },
+    { "id": "fast", "name": "Schnell", "ticksPerSecond": 20 }
+  ],
+  "defaultSpeedLevel": "normal"
 }

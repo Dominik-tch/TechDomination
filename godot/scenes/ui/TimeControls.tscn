@@ -1,0 +1,28 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/TimeControls.cs" id="1_time"]
+
+[node name="TimeControls" type="HBoxContainer"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -456.0
+offset_top = 12.0
+offset_right = -16.0
+offset_bottom = 43.0
+grow_horizontal = 0
+alignment = 2
+script = ExtResource("1_time")
+
+[node name="StatusLabel" type="Label" parent="."]
+layout_mode = 2
+text = "Normal"
+
+[node name="PauseButton" type="Button" parent="."]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+focus_mode = 0
+text = "Pause"
+
+[node name="SpeedButtons" type="HBoxContainer" parent="."]
+layout_mode = 2

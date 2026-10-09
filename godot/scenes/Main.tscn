@@ -5,6 +5,7 @@
 [ext_resource type="Script" path="res://scripts/map/MapCamera.cs" id="3_camera"]
 [ext_resource type="Script" path="res://scripts/ui/TickLabel.cs" id="4_tick"]
 [ext_resource type="Script" path="res://scripts/ui/ProvinceInfoPanel.cs" id="5_panel"]
+[ext_resource type="PackedScene" path="res://scenes/ui/TimeControls.tscn" id="6_time"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -57,3 +58,5 @@ text = "Rohstoff:"
 [node name="BuildingsLabel" type="Label" parent="Hud/ProvinceInfoPanel/Content"]
 layout_mode = 2
 text = "Gebäude:"
+
+[node name="TimeControls" parent="Hud" instance=ExtResource("6_time")]

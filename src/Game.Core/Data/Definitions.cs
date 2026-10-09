@@ -10,6 +10,11 @@ public enum ResourceTier
 /// <summary>Punkt in Kartenkoordinaten. Ganzzahlig, damit Berechnungen auf der Karte deterministisch bleiben.</summary>
 public readonly record struct MapPoint(int X, int Y);
 
+/// <summary>Geschwindigkeitsstufe aus simulation.json.</summary>
+/// <param name="Key">Lesbare ID aus der Datendatei.</param>
+/// <param name="TicksPerSecond">Ticks pro Sekunde Echtzeit. Nur die Darstellungsschicht rechnet damit; die Simulation kennt keine Sekunden.</param>
+public sealed record SpeedLevelDefinition(string Key, string Name, int TicksPerSecond);
+
 /// <summary>Ressource aus resources.json.</summary>
 /// <param name="Key">Lesbare ID aus der Datendatei.</param>
 public sealed record ResourceDefinition(ResourceId Id, string Key, string Name, ResourceTier Tier);

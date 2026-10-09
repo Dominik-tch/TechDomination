@@ -36,12 +36,12 @@ public static class GameDataLoader
     {
         ArgumentNullException.ThrowIfNull(files);
 
-        int ticksPerSecond = LoadTicksPerSecond(Parse<SimulationFile>(files, SimulationFileName));
+        var (speedLevels, defaultSpeedLevel) = LoadSpeedLevels(Parse<SimulationFile>(files, SimulationFileName));
         var resources = LoadResources(Parse<ResourcesFile>(files, ResourcesFileName));
         var nations = LoadNations(Parse<NationsFile>(files, NationsFileName));
         var provinces = LoadProvinces(Parse<MapFile>(files, MapFileName), resources, nations);
 
-        return new GameData(ticksPerSecond, resources, nations, provinces, ComputeContentHash(files));
+        return new GameData(speedLevels, defaultSpeedLevel, resources, nations, provinces, ComputeContentHash(files));
     }
 
     /// <summary>
@@ -63,19 +63,35 @@ public static class GameDataLoader
         return Convert.ToHexString(hash.GetHashAndReset());
     }
 
-    private static int LoadTicksPerSecond(SimulationFile file)
+    private static (List<SpeedLevelDefinition> Levels, SpeedLevelDefinition Default) LoadSpeedLevels(SimulationFile file)
     {
-        int ticksPerSecond = file.TicksPerSecond
-            ?? throw Error(SimulationFileName, "Feld 'ticksPerSecond' fehlt.");
+        var entries = RequireEntries(file.SpeedLevels, SimulationFileName, "speedLevels");
+        var keys = new HashSet<string>(StringComparer.Ordinal);
+        var levels = new List<SpeedLevelDefinition>(entries.Count);
 
-        if (ticksPerSecond is < 1 or > MaxTicksPerSecond)
+        foreach (var entry in entries)
         {
-            throw Error(
-                SimulationFileName,
-                $"'ticksPerSecond' muss zwischen 1 und {MaxTicksPerSecond} liegen, ist aber {ticksPerSecond}.");
+            string key = RequireKey(entry.Id, keys, SimulationFileName, "Geschwindigkeitsstufe");
+            string context = $"Geschwindigkeitsstufe '{key}'";
+            string name = RequireText(entry.Name, SimulationFileName, context, "name");
+            int ticksPerSecond = entry.TicksPerSecond
+                ?? throw Error(SimulationFileName, $"{context}: Feld 'ticksPerSecond' fehlt.");
+
+            if (ticksPerSecond is < 1 or > MaxTicksPerSecond)
+            {
+                throw Error(
+                    SimulationFileName,
+                    $"{context}: 'ticksPerSecond' muss zwischen 1 und {MaxTicksPerSecond} liegen, ist aber {ticksPerSecond}.");
+            }
+
+            levels.Add(new SpeedLevelDefinition(key, name, ticksPerSecond));
         }
 
-        return ticksPerSecond;
+        string defaultKey = RequireText(file.DefaultSpeedLevel, SimulationFileName, "Datei", "defaultSpeedLevel");
+        var defaultLevel = levels.FirstOrDefault(level => level.Key == defaultKey)
+            ?? throw Error(SimulationFileName, $"'defaultSpeedLevel' verweist auf unbekannte Stufe '{defaultKey}'.");
+
+        return (levels, defaultLevel);
     }
 
     private static List<ResourceDefinition> LoadResources(ResourcesFile file)

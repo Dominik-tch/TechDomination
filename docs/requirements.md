@@ -28,6 +28,7 @@ Europakarte mit Provinzen unterschiedlicher Größe. Jede Provinz hat einen Besi
 Die Simulation läuft in Ticks. Es gibt mehrere Geschwindigkeitsstufen.
 - Der Host bestimmt die Geschwindigkeit.
 - Jeder Spieler darf pausieren.
+- Jeder Spieler darf eine Pause wieder aufheben.
 
 **Fertig, wenn:** Pause und Geschwindigkeitswechsel wirken für alle Spieler gleichzeitig.
 
@@ -115,7 +116,6 @@ Diese Punkte werden bewusst **nicht** gebaut, solange sie nicht hier ergänzt we
 
 ## Offene Fragen
 
-- Wer darf eine Pause wieder aufheben?
 - Welche Landeinheiten gibt es im MVP?
 - Wovon hängen Steuern ab (pauschal pro Provinz, Gebäude, Bevölkerung)?
 - Gibt es Bevölkerung oder Moral?

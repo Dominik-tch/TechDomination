@@ -2,16 +2,13 @@ using Game.Core.Data;
 
 namespace Game.Core.Tests.Data;
 
-/// <summary>Allgemeines Laden: Dateien, JSON-Format, simulation.json, Daten-Hash, echte Daten.</summary>
+/// <summary>Allgemeines Laden: Dateien, JSON-Format, Daten-Hash.</summary>
 public class GameDataLoaderTests
 {
     [Fact]
-    public void Load_ValidData_ReadsSimulationValues()
+    public void Load_ValidData_HasContentHash()
     {
-        var data = GameDataLoader.Load(TestData.Files(simulation: TestData.Simulation(25)));
-
-        Assert.Equal(25, data.TicksPerSecond);
-        Assert.False(string.IsNullOrEmpty(data.ContentHash));
+        Assert.False(string.IsNullOrEmpty(TestData.Load().ContentHash));
     }
 
     [Theory]
@@ -38,6 +35,7 @@ public class GameDataLoaderTests
         var error = Assert.Throws<GameDataException>(() => GameDataLoader.Load(files));
 
         Assert.Contains(GameDataLoader.MapFileName, error.Message);
+        Assert.NotNull(error.InnerException);
     }
 
     [Fact]
@@ -50,38 +48,20 @@ public class GameDataLoaderTests
     }
 
     [Fact]
-    public void Load_MissingTicksPerSecond_ThrowsWithFieldName()
-    {
-        var error = Assert.Throws<GameDataException>(
-            () => GameDataLoader.Load(TestData.Files(simulation: [])));
-
-        Assert.Contains("ticksPerSecond", error.Message);
-    }
-
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    [InlineData(1001)]
-    public void Load_TicksPerSecondOutOfRange_Throws(int ticksPerSecond)
-    {
-        var error = Assert.Throws<GameDataException>(
-            () => GameDataLoader.Load(TestData.Files(simulation: TestData.Simulation(ticksPerSecond))));
-
-        Assert.Contains("ticksPerSecond", error.Message);
-    }
-
-    [Fact]
     public void Load_AllowsCommentsAndTrailingCommas()
     {
         var files = TestData.Files();
         files[GameDataLoader.SimulationFileName] = """
             {
               // Kommentar
-              "ticksPerSecond": 12,
+              "speedLevels": [
+                { "id": "normal", "name": "Normal", "ticksPerSecond": 12, },
+              ],
+              "defaultSpeedLevel": "normal",
             }
             """;
 
-        Assert.Equal(12, GameDataLoader.Load(files).TicksPerSecond);
+        Assert.Equal(12, GameDataLoader.Load(files).DefaultSpeedLevel.TicksPerSecond);
     }
 
     [Fact]
@@ -93,9 +73,10 @@ public class GameDataLoaderTests
     [Fact]
     public void ContentHash_DifferentContent_Differs()
     {
-        Assert.NotEqual(
-            GameDataLoader.Load(TestData.Files(simulation: TestData.Simulation(10))).ContentHash,
-            GameDataLoader.Load(TestData.Files(simulation: TestData.Simulation(11))).ContentHash);
+        var changed = TestData.Simulation();
+        changed["speedLevels"]![0]!["ticksPerSecond"] = 6;
+
+        Assert.NotEqual(TestData.Load().ContentHash, GameDataLoader.Load(TestData.Files(simulation: changed)).ContentHash);
     }
 
     [Fact]
@@ -110,10 +91,11 @@ public class GameDataLoaderTests
     [Fact]
     public void ContentHash_IgnoresLineEndings()
     {
+        string json = TestData.Simulation().ToJsonString(new() { WriteIndented = true });
         var lf = TestData.Files();
-        lf[GameDataLoader.SimulationFileName] = "{\n  \"ticksPerSecond\": 10\n}\n";
+        lf[GameDataLoader.SimulationFileName] = json.ReplaceLineEndings("\n");
         var crlf = TestData.Files();
-        crlf[GameDataLoader.SimulationFileName] = "{\r\n  \"ticksPerSecond\": 10\r\n}\r\n";
+        crlf[GameDataLoader.SimulationFileName] = json.ReplaceLineEndings("\r\n");
 
         Assert.Equal(GameDataLoader.Load(lf).ContentHash, GameDataLoader.Load(crlf).ContentHash);
     }

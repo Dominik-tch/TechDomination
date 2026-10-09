@@ -4,24 +4,26 @@ namespace Game.Core.Data;
 public sealed class GameData
 {
     internal GameData(
-        int ticksPerSecond,
+        IReadOnlyList<SpeedLevelDefinition> speedLevels,
+        SpeedLevelDefinition defaultSpeedLevel,
         IReadOnlyList<ResourceDefinition> resources,
         IReadOnlyList<NationDefinition> nations,
         IReadOnlyList<ProvinceDefinition> provinces,
         string contentHash)
     {
-        TicksPerSecond = ticksPerSecond;
+        SpeedLevels = speedLevels;
+        DefaultSpeedLevel = defaultSpeedLevel;
         Resources = resources;
         Nations = nations;
         Provinces = provinces;
         ContentHash = contentHash;
     }
 
-    /// <summary>
-    /// Ticks pro Sekunde bei Normalgeschwindigkeit. Nur die Darstellungsschicht nutzt den Wert,
-    /// um Echtzeit in Ticks umzurechnen; die Simulation selbst kennt keine Sekunden.
-    /// </summary>
-    public int TicksPerSecond { get; }
+    /// <summary>Geschwindigkeitsstufen in der Reihenfolge der Datei.</summary>
+    public IReadOnlyList<SpeedLevelDefinition> SpeedLevels { get; }
+
+    /// <summary>Stufe bei Spielbeginn.</summary>
+    public SpeedLevelDefinition DefaultSpeedLevel { get; }
 
     /// <summary>Alle Ressourcen, Index = <see cref="ResourceId.Value"/>.</summary>
     public IReadOnlyList<ResourceDefinition> Resources { get; }
@@ -34,6 +36,10 @@ public sealed class GameData
 
     /// <summary>SHA-256 über alle Datendateien. Erkennt abweichende Regelwerke bei Spielständen und Netzwerk-Beitritt.</summary>
     public string ContentHash { get; }
+
+    /// <summary>Stufe mit der lesbaren ID, oder <c>null</c>, wenn es sie nicht gibt.</summary>
+    public SpeedLevelDefinition? FindSpeedLevel(string key) =>
+        SpeedLevels.FirstOrDefault(level => string.Equals(level.Key, key, StringComparison.Ordinal));
 
     public ResourceDefinition GetResource(ResourceId id) => Resources[id.Value];
 
