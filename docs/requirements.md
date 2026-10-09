@@ -47,6 +47,12 @@ Die Simulation läuft in Ticks. Es gibt mehrere Geschwindigkeitsstufen.
 
 ### 4. Gebäude
 Gebäude können in jeder Provinz gebaut werden und haben Ausbaustufen. Bauen kostet Ressourcen und Zeit.
+- **Förderanlage:** erhöht den Rohstoff-Output der Provinz um 10 % des Basiswerts je Stufe, maximal 5 Stufen (Stufe 5 = +50 %).
+- Weitere Gebäude kommen mit ihren Features (Fabriken mit der Wirtschaft, Kaserne und Festung mit dem Militär).
+- Pro Provinz gibt es höchstens **eine Baustelle** gleichzeitig.
+- Die Kosten werden beim Baustart bezahlt. Ein Bau kann abgebrochen werden, die Kosten werden dann **voll erstattet**.
+- Bei Eroberung gehen die Gebäude an den neuen Besitzer über; eine laufende Baustelle verfällt ohne Erstattung.
+- Fertige Bauten und abgelehnte Aktionen werden als kurze Benachrichtigung angezeigt.
 **Fertig, wenn:** Bau, Bauzeit, Ausbau und Wirkung der Gebäude funktionieren.
 
 ### 5. Militär (nur Land)

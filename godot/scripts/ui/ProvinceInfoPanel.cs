@@ -10,7 +10,7 @@ public partial class ProvinceInfoPanel : PanelContainer
     private Label _nameLabel = null!;
     private Label _ownerLabel = null!;
     private Label _resourceLabel = null!;
-    private Label _buildingsLabel = null!;
+    private BuildingsSection _buildingsSection = null!;
     private SimulationDriver _driver = null!;
     private ProvinceId? _province;
 
@@ -19,7 +19,7 @@ public partial class ProvinceInfoPanel : PanelContainer
         _nameLabel = GetNode<Label>("Content/NameLabel");
         _ownerLabel = GetNode<Label>("Content/OwnerLabel");
         _resourceLabel = GetNode<Label>("Content/ResourceLabel");
-        _buildingsLabel = GetNode<Label>("Content/BuildingsLabel");
+        _buildingsSection = GetNode<BuildingsSection>("Content/BuildingsSection");
         _driver = GetNode<SimulationDriver>("/root/SimulationDriver");
         Visible = false;
     }
@@ -27,6 +27,7 @@ public partial class ProvinceInfoPanel : PanelContainer
     public void ShowProvince(ProvinceId? province)
     {
         _province = province;
+        _buildingsSection.Province = province;
         Visible = province is not null;
         Refresh();
     }
@@ -47,10 +48,7 @@ public partial class ProvinceInfoPanel : PanelContainer
         var province = data.GetProvince(id);
         _nameLabel.Text = province.Name;
         _ownerLabel.Text = $"Besitzer: {data.GetNation(state.GetProvince(id).Owner).Name}";
-        long perMinute = UiFormat.PerMinute(EconomyRules.ProductionPerInterval(data, province), session);
+        long perMinute = UiFormat.PerMinute(EconomyRules.ProductionPerInterval(state, data, province), session);
         _resourceLabel.Text = $"Rohstoff: {data.GetResource(province.Resource).Name} ({UiFormat.Signed(UiFormat.Resource(perMinute), perMinute)}/min)";
-
-        // Gebäude kommen mit Meilenstein M5.
-        _buildingsLabel.Text = "Gebäude: keine";
     }
 }

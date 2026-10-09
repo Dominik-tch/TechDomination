@@ -35,6 +35,31 @@ internal sealed class ResourceEntry
     public decimal? Production { get; set; }
 }
 
+internal sealed class BuildingsFile
+{
+    public List<BuildingEntry?>? Buildings { get; set; }
+}
+
+internal sealed class BuildingEntry
+{
+    public string? Id { get; set; }
+
+    public string? Name { get; set; }
+
+    public decimal? ProductionBonusPercent { get; set; }
+
+    public List<BuildingLevelEntry?>? Levels { get; set; }
+}
+
+internal sealed class BuildingLevelEntry
+{
+    public decimal? Money { get; set; }
+
+    public Dictionary<string, decimal>? Resources { get; set; }
+
+    public int? BuildTicks { get; set; }
+}
+
 internal sealed class EconomyFile
 {
     public int? IntervalTicks { get; set; }

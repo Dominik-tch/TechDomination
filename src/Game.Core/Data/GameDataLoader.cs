@@ -21,6 +21,7 @@ public static class GameDataLoader
     public const string NationsFileName = "nations.json";
     public const string MapFileName = "map.json";
     public const string EconomyFileName = "economy.json";
+    public const string BuildingsFileName = "buildings.json";
 
     // Technische Obergrenze, kein Balancing-Wert.
     private const int MaxTicksPerSecond = 1000;
@@ -43,9 +44,10 @@ public static class GameDataLoader
         var nations = LoadNations(Parse<NationsFile>(files, NationsFileName));
         var provinces = LoadProvinces(Parse<MapFile>(files, MapFileName), resources, nations);
         var economy = LoadEconomy(Parse<EconomyFile>(files, EconomyFileName), resources);
+        var buildings = LoadBuildings(Parse<BuildingsFile>(files, BuildingsFileName), resources);
 
         return new GameData(
-            speedLevels, defaultSpeedLevel, economy, resources, nations, provinces, ComputeContentHash(files));
+            speedLevels, defaultSpeedLevel, economy, resources, nations, provinces, buildings, ComputeContentHash(files));
     }
 
     /// <summary>
@@ -146,17 +148,66 @@ public static class GameDataLoader
         long taxPerProvince = RequireAmount(file.TaxPerProvince, Quantities.MoneyScale, EconomyFileName, context, "taxPerProvince");
         long startMoney = RequireAmount(file.StartMoney, Quantities.MoneyScale, EconomyFileName, context, "startMoney");
 
-        // Fehlende Ressourcen starten mit 0; unbekannte sind ein Tippfehler.
-        var startResources = new long[resources.Count];
-        foreach (var (resourceKey, amount) in file.StartResources ?? [])
-        {
-            var resource = resources.FirstOrDefault(r => r.Key == resourceKey)
-                ?? throw Error(EconomyFileName, $"'startResources' enthält unbekannte Ressource '{resourceKey}'.");
-            startResources[resource.Id.Value] = RequireAmount(
-                amount, Quantities.ResourceScale, EconomyFileName, "'startResources'", resourceKey);
-        }
+        var startResources = LoadResourceAmounts(file.StartResources, resources, EconomyFileName, "'startResources'");
 
         return new EconomyDefinition(intervalTicks, taxPerProvince, startMoney, startResources);
+    }
+
+    private static List<BuildingDefinition> LoadBuildings(BuildingsFile file, IReadOnlyList<ResourceDefinition> resources)
+    {
+        var entries = RequireEntries(file.Buildings, BuildingsFileName, "buildings");
+        var keys = new HashSet<string>(StringComparer.Ordinal);
+        var buildings = new List<BuildingDefinition>(entries.Count);
+
+        foreach (var entry in entries)
+        {
+            string key = RequireKey(entry.Id, keys, BuildingsFileName, "Gebäude");
+            string context = $"Gebäude '{key}'";
+            string name = RequireText(entry.Name, BuildingsFileName, context, "name");
+
+            // Prozent mit bis zu 2 Nachkommastellen → Basispunkte (10 % = 1000). Ohne Angabe: keine Wirkung auf die Produktion.
+            long bonus = entry.ProductionBonusPercent is null
+                ? 0
+                : RequireAmount(entry.ProductionBonusPercent, 100, BuildingsFileName, context, "productionBonusPercent");
+
+            var levelEntries = RequireEntries(entry.Levels, BuildingsFileName, "levels");
+            var levels = new List<BuildingLevelDefinition>(levelEntries.Count);
+            foreach (var level in levelEntries)
+            {
+                string levelContext = $"{context}, Stufe {levels.Count + 1}";
+                long money = RequireAmount(level.Money, Quantities.MoneyScale, BuildingsFileName, levelContext, "money");
+                var costs = LoadResourceAmounts(level.Resources, resources, BuildingsFileName, $"{levelContext}, 'resources'");
+                int buildTicks = level.BuildTicks
+                    ?? throw Error(BuildingsFileName, $"{levelContext}: Feld 'buildTicks' fehlt.");
+                if (buildTicks < 1)
+                {
+                    throw Error(BuildingsFileName, $"{levelContext}: 'buildTicks' muss mindestens 1 sein, ist aber {buildTicks}.");
+                }
+
+                levels.Add(new BuildingLevelDefinition(money, costs, buildTicks));
+            }
+
+            buildings.Add(new BuildingDefinition(new BuildingId(buildings.Count), key, name, levels, bonus));
+        }
+
+        return buildings;
+    }
+
+    /// <summary>Ressourcenmengen nach lesbarer ID. Fehlende Ressourcen sind 0; unbekannte sind ein Tippfehler.</summary>
+    private static long[] LoadResourceAmounts(
+        Dictionary<string, decimal>? amounts, IReadOnlyList<ResourceDefinition> resources, string fileName, string context)
+    {
+        var result = new long[resources.Count];
+
+        // Sortiert, damit bei mehreren Fehlern immer derselbe gemeldet wird.
+        foreach (var (resourceKey, amount) in (amounts ?? []).OrderBy(pair => pair.Key, StringComparer.Ordinal))
+        {
+            var resource = resources.FirstOrDefault(r => r.Key == resourceKey)
+                ?? throw Error(fileName, $"{context} enthält unbekannte Ressource '{resourceKey}'.");
+            result[resource.Id.Value] = RequireAmount(amount, Quantities.ResourceScale, fileName, context, resourceKey);
+        }
+
+        return result;
     }
 
     /// <summary>Pflichtfeld mit nicht-negativer Dezimalzahl, exakt umgerechnet in die Untereinheit.</summary>

@@ -1,0 +1,16 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/Notifications.cs" id="1_notifications"]
+
+[node name="Notifications" type="VBoxContainer"]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -216.0
+offset_right = 436.0
+offset_bottom = -16.0
+grow_vertical = 0
+mouse_filter = 2
+alignment = 2
+script = ExtResource("1_notifications")

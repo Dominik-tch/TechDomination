@@ -10,6 +10,7 @@ public sealed class GameData
         IReadOnlyList<ResourceDefinition> resources,
         IReadOnlyList<NationDefinition> nations,
         IReadOnlyList<ProvinceDefinition> provinces,
+        IReadOnlyList<BuildingDefinition> buildings,
         string contentHash)
     {
         SpeedLevels = speedLevels;
@@ -18,6 +19,7 @@ public sealed class GameData
         Resources = resources;
         Nations = nations;
         Provinces = provinces;
+        Buildings = buildings;
         ContentHash = contentHash;
     }
 
@@ -38,6 +40,9 @@ public sealed class GameData
     /// <summary>Alle Provinzen, Index = <see cref="ProvinceId.Value"/>.</summary>
     public IReadOnlyList<ProvinceDefinition> Provinces { get; }
 
+    /// <summary>Alle Gebäudetypen, Index = <see cref="BuildingId.Value"/>.</summary>
+    public IReadOnlyList<BuildingDefinition> Buildings { get; }
+
     /// <summary>SHA-256 über alle Datendateien. Erkennt abweichende Regelwerke bei Spielständen und Netzwerk-Beitritt.</summary>
     public string ContentHash { get; }
 
@@ -50,4 +55,12 @@ public sealed class GameData
     public NationDefinition GetNation(NationId id) => Nations[id.Value];
 
     public ProvinceDefinition GetProvince(ProvinceId id) => Provinces[id.Value];
+
+    public BuildingDefinition GetBuilding(BuildingId id) => Buildings[id.Value];
+
+    public bool Contains(ProvinceId id) => id.Value >= 0 && id.Value < Provinces.Count;
+
+    public bool Contains(NationId id) => id.Value >= 0 && id.Value < Nations.Count;
+
+    public bool Contains(BuildingId id) => id.Value >= 0 && id.Value < Buildings.Count;
 }

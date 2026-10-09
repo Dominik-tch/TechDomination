@@ -62,6 +62,21 @@ public class GameSessionSaveTests
     }
 
     [Fact]
+    public void Construction_SurvivesSaveAndLoad()
+    {
+        var session = NewSession();
+        session.Submit(Red, new Game.Core.Commands.BuildBuildingCommand(A, Mine));
+        session.Advance();
+
+        var loaded = SaveAndLoad(session);
+        loaded.Resume(Host);
+        loaded.Advance();
+        loaded.Advance();
+
+        Assert.Equal(1, loaded.State.GetProvince(A).GetBuildingLevel(Mine));
+    }
+
+    [Fact]
     public void FromSaveGame_WithOtherData_IsRejected()
     {
         var save = NewSession().CreateSaveGame();
@@ -84,6 +99,7 @@ public class GameSessionSaveTests
         Play(continuous, ticksBeforeSave);
         continuous.Pause(Guest);
         continuous.Submit(Blue, new TransferProvinceCommand(C, Red));
+        continuous.Submit(Blue, new Game.Core.Commands.BuildBuildingCommand(B, Mine));
         continuous.Resume(Guest);
         Play(continuous, ticksAfterLoad);
 
@@ -91,6 +107,7 @@ public class GameSessionSaveTests
         Play(interrupted, ticksBeforeSave);
         interrupted.Pause(Guest);
         interrupted.Submit(Blue, new TransferProvinceCommand(C, Red));
+        interrupted.Submit(Blue, new Game.Core.Commands.BuildBuildingCommand(B, Mine));
         var resumed = SaveAndLoad(interrupted);
         resumed.Resume(Host);
         Play(resumed, ticksAfterLoad);

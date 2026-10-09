@@ -26,6 +26,13 @@ public static class UiFormat
     /// <summary>Wert mit Vorzeichen, z. B. „+12,5“.</summary>
     public static string Signed(string formatted, long value) => value >= 0 ? $"+{formatted}" : formatted;
 
+    /// <summary>Echtzeit bis zum Ablauf von <paramref name="ticks"/> bei der aktuellen Geschwindigkeit, als „m:ss“.</summary>
+    public static string Duration(long ticks, GameSession session)
+    {
+        long seconds = (ticks + session.Speed.TicksPerSecond - 1) / session.Speed.TicksPerSecond;
+        return $"{seconds / 60}:{seconds % 60:00}";
+    }
+
     /// <summary>Spielzeit als „h:mm:ss“, gerechnet bei Standardgeschwindigkeit.</summary>
     public static string PlayTime(long ticks, Game.Core.Data.GameData data)
     {

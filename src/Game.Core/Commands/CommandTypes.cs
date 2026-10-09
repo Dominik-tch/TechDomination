@@ -12,8 +12,12 @@ public static class CommandTypes
     private static readonly ConcurrentDictionary<Type, string> NamesByType = new();
     private static readonly object RegistrationLock = new();
 
-    // Spiel-Commands werden hier mit ihrem festen Namen registriert, sobald es sie gibt (ab M5):
-    // static CommandTypes() { Register<BuildBuildingCommand>("buildBuilding"); }
+    // Feste Namen der Spiel-Commands. Nie umbenennen, sonst lassen sich alte Spielstände nicht mehr laden.
+    static CommandTypes()
+    {
+        Register<BuildBuildingCommand>("buildBuilding");
+        Register<CancelConstructionCommand>("cancelConstruction");
+    }
 
     /// <summary>Name des registrierten Command-Typs.</summary>
     /// <exception cref="InvalidOperationException">Der Typ ist nicht registriert.</exception>

@@ -24,6 +24,27 @@ public sealed record SpeedLevelDefinition(string Key, string Name, int TicksPerS
 public sealed record ResourceDefinition(
     ResourceId Id, string Key, string Name, ResourceTier Tier, long ProductionPerInterval);
 
+/// <summary>Kosten und Bauzeit einer Gebäudestufe.</summary>
+/// <param name="Money">Geld in Cent.</param>
+/// <param name="Resources">Ressourcen in Tausendstel, Index = <see cref="ResourceId.Value"/>.</param>
+/// <param name="BuildTicks">Bauzeit in Ticks (≥ 1).</param>
+public sealed record BuildingLevelDefinition(long Money, IReadOnlyList<long> Resources, int BuildTicks);
+
+/// <summary>Gebäudetyp aus buildings.json.</summary>
+/// <param name="Key">Lesbare ID aus der Datendatei.</param>
+/// <param name="Levels">Stufe 1 bis Maximalstufe; Index 0 = Stufe 1.</param>
+/// <param name="ProductionBonusPerLevel">
+/// Erhöhung des Rohstoff-Outputs der Provinz je Stufe in Basispunkten des Basiswerts (1000 = 10 %).
+/// </param>
+public sealed record BuildingDefinition(
+    BuildingId Id, string Key, string Name, IReadOnlyList<BuildingLevelDefinition> Levels, long ProductionBonusPerLevel)
+{
+    public int MaxLevel => Levels.Count;
+
+    /// <summary>Kosten und Bauzeit für die angegebene Stufe (1 bis <see cref="MaxLevel"/>).</summary>
+    public BuildingLevelDefinition Level(int level) => Levels[level - 1];
+}
+
 /// <summary>Wirtschaftsregeln aus economy.json.</summary>
 /// <param name="IntervalTicks">Alle wie viele Ticks Produktion und Steuern gutgeschrieben werden.</param>
 /// <param name="TaxPerProvince">Steuern pro Provinz und Takt, in Cent.</param>

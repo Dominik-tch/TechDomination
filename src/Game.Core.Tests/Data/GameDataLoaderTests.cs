@@ -17,6 +17,7 @@ public class GameDataLoaderTests
     [InlineData(GameDataLoader.NationsFileName)]
     [InlineData(GameDataLoader.MapFileName)]
     [InlineData(GameDataLoader.EconomyFileName)]
+    [InlineData(GameDataLoader.BuildingsFileName)]
     public void Load_MissingFile_ThrowsWithFileName(string fileName)
     {
         var files = TestData.Files();

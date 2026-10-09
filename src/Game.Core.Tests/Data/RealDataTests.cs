@@ -15,6 +15,7 @@ public class RealDataTests
         Assert.NotEmpty(_data.SpeedLevels);
         Assert.NotEmpty(_data.Provinces);
         Assert.NotEmpty(_data.Nations);
+        Assert.NotEmpty(_data.Buildings);
     }
 
     [Fact]

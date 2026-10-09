@@ -40,4 +40,9 @@ internal static class TestIds
     public static readonly ProvinceId A = new(0);
     public static readonly ProvinceId B = new(1);
     public static readonly ProvinceId C = new(2);
+
+    public static readonly BuildingId Mine = new(0);
+
+    public static readonly ResourceId Wood = new(0);
+    public static readonly ResourceId Fish = new(1);
 }

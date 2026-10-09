@@ -34,6 +34,18 @@ public class GameStateFactoryTests
     }
 
     [Fact]
+    public void CreateNew_ProvincesStartWithoutBuildingsOrConstruction()
+    {
+        var state = GameStateFactory.CreateNew(TestData.Load(), seed: 1);
+
+        Assert.All(state.Provinces, province =>
+        {
+            Assert.Equal([0], province.BuildingLevels);
+            Assert.Null(province.Construction);
+        });
+    }
+
+    [Fact]
     public void GetProvince_ReturnsStateById()
     {
         var state = GameStateFactory.CreateNew(TestData.Load(), seed: 1);
@@ -46,8 +58,8 @@ public class GameStateFactoryTests
     {
         var provinces = new List<ProvinceState>
         {
-            new(new ProvinceId(1), new NationId(0)),
-            new(new ProvinceId(0), new NationId(0)),
+            new(new ProvinceId(1), new NationId(0), [], null),
+            new(new ProvinceId(0), new NationId(0), [], null),
         };
 
         Assert.Throws<ArgumentException>(

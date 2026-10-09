@@ -1,4 +1,5 @@
 using Game.Core;
+using Game.Core.Commands;
 using Game.Core.Data;
 using Game.Core.Events;
 using Game.Core.Save;
@@ -13,7 +14,7 @@ namespace TechDomination;
 /// Autoload: lädt das Regelwerk aus res://data/, hält die Session und rechnet Echtzeit in Ticks um.
 /// Läuft nur beim Host bzw. im Einzelspieler (siehe docs/architecture.md, Abschnitt 4.2).
 /// </summary>
-public partial class SimulationDriver : Node
+public partial class SimulationDriver : Node, ICommandSink
 {
     private const string DataDirectory = "res://data";
 
@@ -27,6 +28,9 @@ public partial class SimulationDriver : Node
     private long _autosaveIntervalTicks;
 
     public GameSession? Session { get; private set; }
+
+    /// <summary>Events jedes ausgeführten Ticks, z. B. für Benachrichtigungen.</summary>
+    public event Action<IReadOnlyList<GameEvent>>? EventsRaised;
 
     /// <summary>Der Spieler an diesem Rechner. Im Einzelspieler ist er zugleich der Host.</summary>
     public PlayerId LocalPlayer { get; } = new(0);
@@ -100,7 +104,12 @@ public partial class SimulationDriver : Node
 
         for (int i = 0; i < Math.Min(ticks, MaxTicksPerFrame); i++)
         {
-            ReportEvents(Session.Advance());
+            var events = Session.Advance();
+            if (events.Count > 0)
+            {
+                EventsRaised?.Invoke(events);
+            }
+
             AutosaveIfDue();
         }
     }
@@ -133,14 +142,7 @@ public partial class SimulationDriver : Node
         }
     }
 
-    // Bis es Benachrichtigungen in der UI gibt, landen abgelehnte Commands im Log.
-    private static void ReportEvents(IReadOnlyList<GameEvent> events)
-    {
-        foreach (var rejected in events.OfType<CommandRejected>())
-        {
-            GD.PushWarning($"Command abgelehnt (Tick {rejected.Tick}): {rejected.Envelope.Command} – {rejected.Reason}");
-        }
-    }
+    public void Submit(Command command) => Session?.Submit(LocalNation, command);
 
     private static Dictionary<string, string> ReadDataFiles()
     {

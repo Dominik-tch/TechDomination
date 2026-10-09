@@ -116,7 +116,11 @@ public static class SaveGameSerializer
         bool matches = state.Provinces.Count == data.Provinces.Count
             && state.Nations.Count == data.Nations.Count
             && state.Nations.All(n => n.Resources.Count == data.Resources.Count)
-            && state.Provinces.All(p => p.Owner.Value >= 0 && p.Owner.Value < data.Nations.Count)
+            && state.Provinces.All(p => data.Contains(p.Owner)
+                && p.BuildingLevels.Count == data.Buildings.Count
+                && p.BuildingLevels.Select((level, i) => level >= 0 && level <= data.Buildings[i].MaxLevel).All(ok => ok)
+                && (p.Construction is not { } c
+                    || (data.Contains(c.Building) && c.TargetLevel >= 1 && c.TargetLevel <= data.GetBuilding(c.Building).MaxLevel)))
             && save.Session.SpeedLevel is not null
             && save.Session.PendingCommands is { } pending
             && pending.All(c => c?.Command is not null && c.ExecuteAtTick == state.Tick);

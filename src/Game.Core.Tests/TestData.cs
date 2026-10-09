@@ -11,6 +11,7 @@ namespace Game.Core.Tests;
 /// Testkarte: drei Provinzen in einer Reihe, a | b | c, je 10×10 Einheiten.
 /// a gehört "red", b und c gehören "blue". a und c produzieren Holz (1,5/Takt), b Fisch (0,25/Takt).
 /// Wirtschaftstakt: 4 Ticks, Steuern 2,50 pro Provinz und Takt.
+/// Gebäude "mine": +10 % je Stufe, 2 Stufen. Stufe 1: 10 Geld, 2 Holz, 3 Ticks. Stufe 2: 20 Geld, 4 Holz, 0,5 Fisch, 5 Ticks.
 /// </remarks>
 internal static class TestData
 {
@@ -72,19 +73,35 @@ internal static class TestData
         }
         """);
 
+    public static JsonObject Buildings() => Parse("""
+        {
+          "buildings": [
+            {
+              "id": "mine", "name": "Mine", "productionBonusPercent": 10,
+              "levels": [
+                { "money": 10, "resources": { "wood": 2 }, "buildTicks": 3 },
+                { "money": 20, "resources": { "wood": 4, "fish": 0.5 }, "buildTicks": 5 }
+              ]
+            }
+          ]
+        }
+        """);
+
     /// <summary>Alle Datendateien; nicht übergebene Teile werden mit den Standard-Testdaten gefüllt.</summary>
     public static Dictionary<string, string> Files(
         JsonObject? simulation = null,
         JsonObject? resources = null,
         JsonObject? nations = null,
         JsonObject? map = null,
-        JsonObject? economy = null) => new(StringComparer.Ordinal)
+        JsonObject? economy = null,
+        JsonObject? buildings = null) => new(StringComparer.Ordinal)
     {
         [GameDataLoader.SimulationFileName] = (simulation ?? Simulation()).ToJsonString(),
         [GameDataLoader.ResourcesFileName] = (resources ?? Resources()).ToJsonString(),
         [GameDataLoader.NationsFileName] = (nations ?? Nations()).ToJsonString(),
         [GameDataLoader.MapFileName] = (map ?? Map()).ToJsonString(),
         [GameDataLoader.EconomyFileName] = (economy ?? Economy()).ToJsonString(),
+        [GameDataLoader.BuildingsFileName] = (buildings ?? Buildings()).ToJsonString(),
     };
 
     public static GameData Load() => GameDataLoader.Load(Files());

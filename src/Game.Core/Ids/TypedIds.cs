@@ -39,6 +39,14 @@ public readonly record struct ResourceId(int Value) : ITypedId<ResourceId>
     public override string ToString() => $"Resource#{Value}";
 }
 
+[JsonConverter(typeof(TypedIdJsonConverter<BuildingId>))]
+public readonly record struct BuildingId(int Value) : ITypedId<BuildingId>
+{
+    public static BuildingId FromValue(int value) => new(value);
+
+    public override string ToString() => $"Building#{Value}";
+}
+
 /// <summary>Ein Spieler in der Session (Mensch am Host oder Client). Nicht dasselbe wie die Nation, die er steuert.</summary>
 [JsonConverter(typeof(TypedIdJsonConverter<PlayerId>))]
 public readonly record struct PlayerId(int Value) : ITypedId<PlayerId>

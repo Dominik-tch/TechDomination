@@ -13,6 +13,7 @@ public static class Simulation
     private static readonly ISimulationSystem[] Systems =
     [
         new ProductionSystem(),
+        new ConstructionSystem(),
         new TaxSystem(),
     ];
 
@@ -55,7 +56,7 @@ public static class Simulation
 
         foreach (var system in Systems)
         {
-            system.Update(state, data);
+            system.Update(state, data, events);
         }
 
         state.Tick++;

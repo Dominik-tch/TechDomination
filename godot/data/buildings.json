@@ -1,0 +1,20 @@
+{
+  // Gebäude. Alle Kosten und Bauzeiten sind Platzhalter fürs Balancing.
+  // Jede Stufe in "levels" hat eigene Kosten (bei Baustart bezahlt) und eine Bauzeit in Ticks
+  // (10 Ticks = 1 Sekunde bei "normal"). Die Anzahl der Einträge ist die Maximalstufe.
+  "buildings": [
+    {
+      "id": "extraction",
+      "name": "Förderanlage",
+      // Erhöht den Rohstoff-Output der Provinz je Stufe um diesen Anteil des Basiswerts (Stufe 5 = +50 %).
+      "productionBonusPercent": 10,
+      "levels": [
+        { "money": 100, "resources": { "wood": 10, "steel": 5 }, "buildTicks": 300 },
+        { "money": 200, "resources": { "wood": 20, "steel": 10 }, "buildTicks": 600 },
+        { "money": 300, "resources": { "wood": 30, "steel": 15 }, "buildTicks": 900 },
+        { "money": 400, "resources": { "wood": 40, "steel": 20 }, "buildTicks": 1200 },
+        { "money": 500, "resources": { "wood": 50, "steel": 25 }, "buildTicks": 1500 }
+      ]
+    }
+  ]
+}

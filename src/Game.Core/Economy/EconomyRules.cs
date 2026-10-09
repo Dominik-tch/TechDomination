@@ -17,9 +17,26 @@ public static class EconomyRules
     /// <summary>Wird im Tick <paramref name="tick"/> gutgeschrieben? Das ist am Ende jedes vollen Takts der Fall.</summary>
     public static bool IsEconomyTick(long tick, GameData data) => (tick + 1) % data.Economy.IntervalTicks == 0;
 
-    /// <summary>Menge, die eine Provinz pro Takt von ihrem Rohstoff produziert, in Tausendstel.</summary>
-    public static long ProductionPerInterval(GameData data, ProvinceDefinition province) =>
-        data.GetResource(province.Resource).ProductionPerInterval;
+    /// <summary>
+    /// Menge, die eine Provinz pro Takt von ihrem Rohstoff produziert, in Tausendstel:
+    /// Basiswert plus Gebäudebonus. Der Bonus bezieht sich immer auf den Basiswert (Stufe 5 à 10 % = +50 %).
+    /// </summary>
+    public static long ProductionPerInterval(GameState state, GameData data, ProvinceDefinition province)
+    {
+        long baseAmount = data.GetResource(province.Resource).ProductionPerInterval;
+
+        long bonusBasisPoints = 0;
+        var provinceState = state.GetProvince(province.Id);
+        foreach (var building in data.Buildings)
+        {
+            bonusBasisPoints += building.ProductionBonusPerLevel * provinceState.GetBuildingLevel(building.Id);
+        }
+
+        return baseAmount + baseAmount * bonusBasisPoints / BasisPointsPerWhole;
+    }
+
+    // 10 000 Basispunkte = 100 %.
+    private const long BasisPointsPerWhole = 10_000;
 
     /// <summary>Was eine Nation mit ihrem aktuellen Besitz pro Takt einnimmt.</summary>
     public static NationIncome IncomePerInterval(GameState state, GameData data, NationId nation)
@@ -34,7 +51,7 @@ public static class EconomyRules
             if (state.GetProvince(province.Id).Owner == nation)
             {
                 money += data.Economy.TaxPerProvince;
-                resources[province.Resource.Value] += ProductionPerInterval(data, province);
+                resources[province.Resource.Value] += ProductionPerInterval(state, data, province);
             }
         }
 
