@@ -220,7 +220,7 @@
     {
       "id": "cannery",
       "name": "Konservenfabrik",
-      "recipe": { "inputs": { "fish": 2, "steel": 1 }, "output": "cannedFood", "amount": 1 },
+      "recipe": { "inputs": { "steel": 1, "fish": 4 }, "output": "cannedFood", "amount": 2 },
       "levels": [
         { "money": 2000, "resources": { "wood": 200, "steel": 60 }, "buildTicks": 600 },
         { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
