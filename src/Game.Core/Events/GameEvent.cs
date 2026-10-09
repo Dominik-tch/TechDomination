@@ -10,5 +10,10 @@ public abstract record GameEvent(long Tick);
 public sealed record BuildingCompleted(long Tick, ProvinceId Province, BuildingId Building, int Level, NationId Owner)
     : GameEvent(Tick);
 
+/// <summary>Eine ankommende Armee wurde mit einer dort stehenden eigenen Armee zusammengeführt.</summary>
+/// <param name="Absorbed">Die angekommene Armee; sie existiert danach nicht mehr.</param>
+/// <param name="Into">Die stehende Armee, die alle Einheiten übernommen hat.</param>
+public sealed record ArmiesMerged(long Tick, ArmyId Absorbed, ArmyId Into) : GameEvent(Tick);
+
 /// <summary>Ein Command wurde bei der Ausführung abgelehnt.</summary>
 public sealed record CommandRejected(long Tick, CommandEnvelope Envelope, string Reason) : GameEvent(Tick);

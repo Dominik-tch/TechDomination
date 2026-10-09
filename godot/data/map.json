@@ -1,74 +1,91 @@
 {
   // Testkarte für die technische Entwicklung. Wird mit der Europakarte (M13) ersetzt.
+  // "city" = Stadt der Provinz; Städte benachbarter Provinzen sind über gerade Pfade verbunden.
+  // "startArmy" = Einheiten, die zu Spielbeginn in der Stadt stehen (Platzhalter bis zum Spielstart-Setup in M9).
   // Koordinaten in Karteneinheiten, x nach rechts, y nach unten.
   // "neighbors" = Nachbarn über Land, müssen gegenseitig eingetragen sein.
   // Inseln ohne Nachbarn sind erlaubt; Landeinheiten erreichen sie nicht.
   "provinces": [
     {
-      "id": "nordhafen", "name": "Nordhafen", "resource": "fish", "size": 2, "owner": "nordreich",
+      "id": "nordhafen", "name": "Nordhafen", "resource": "fish", "owner": "nordreich",
       "neighbors": ["kiefernwald", "weizenfeld"],
       "outline": [[40, 40], [320, 30], [280, 240], [30, 260]],
-      "label": [165, 140]
+      "label": [165, 140],
+      "city": [160, 195],
+      "startArmy": { "infantry": 2 }
     },
     {
-      "id": "kiefernwald", "name": "Kiefernwald", "resource": "wood", "size": 3, "owner": "nordreich",
+      "id": "kiefernwald", "name": "Kiefernwald", "resource": "wood", "owner": "nordreich",
       "neighbors": ["nordhafen", "eisenberg", "mittelburg", "kohlental"],
       "outline": [[320, 30], [600, 60], [640, 250], [470, 280], [280, 240]],
-      "label": [460, 150]
+      "label": [460, 150],
+      "city": [470, 200],
+      "startArmy": { "infantry": 4, "cavalry": 1 }
     },
     {
-      "id": "eisenberg", "name": "Eisenberg", "resource": "steel", "size": 3, "owner": "nordreich",
+      "id": "eisenberg", "name": "Eisenberg", "resource": "steel", "owner": "nordreich",
       "neighbors": ["kiefernwald", "oelsenke"],
       "outline": [[600, 60], [860, 40], [880, 270], [640, 250]],
-      "label": [745, 150]
+      "label": [745, 150],
+      "city": [750, 200]
     },
     {
-      "id": "weizenfeld", "name": "Weizenfeld", "resource": "grain", "size": 2, "owner": "westland",
+      "id": "weizenfeld", "name": "Weizenfeld", "resource": "grain", "owner": "westland",
       "neighbors": ["nordhafen", "mittelburg", "suedmark"],
       "outline": [[30, 260], [280, 240], [250, 500], [50, 480]],
-      "label": [150, 370]
+      "label": [150, 370],
+      "city": [150, 420]
     },
     {
-      "id": "mittelburg", "name": "Mittelburg", "resource": "steel", "size": 1, "owner": "westland",
+      "id": "mittelburg", "name": "Mittelburg", "resource": "steel", "owner": "westland",
       "neighbors": ["kiefernwald", "weizenfeld", "kohlental", "gasfeld"],
       "outline": [[280, 240], [470, 280], [420, 470], [250, 500]],
-      "label": [355, 370]
+      "label": [355, 370],
+      "city": [355, 420],
+      "startArmy": { "infantry": 4, "artillery": 1 }
     },
     {
-      "id": "kohlental", "name": "Kohlental", "resource": "coal", "size": 2, "owner": "ostmark",
+      "id": "kohlental", "name": "Kohlental", "resource": "coal", "owner": "ostmark",
       "neighbors": ["kiefernwald", "mittelburg", "oelsenke", "gasfeld"],
       "outline": [[470, 280], [640, 250], [600, 520], [420, 470]],
-      "label": [530, 380]
+      "label": [530, 380],
+      "city": [530, 430],
+      "startArmy": { "infantry": 3, "motorized": 1 }
     },
     {
-      "id": "oelsenke", "name": "Ölsenke", "resource": "oil", "size": 3, "owner": "ostmark",
+      "id": "oelsenke", "name": "Ölsenke", "resource": "oil", "owner": "ostmark",
       "neighbors": ["eisenberg", "kohlental", "grenzland"],
       "outline": [[640, 250], [880, 270], [900, 500], [780, 480], [600, 520]],
-      "label": [760, 390]
+      "label": [760, 390],
+      "city": [770, 440]
     },
     {
-      "id": "suedmark", "name": "Südmark", "resource": "wood", "size": 2, "owner": "westland",
+      "id": "suedmark", "name": "Südmark", "resource": "wood", "owner": "westland",
       "neighbors": ["weizenfeld", "gasfeld"],
       "outline": [[50, 480], [250, 500], [330, 690], [60, 680]],
-      "label": [170, 590]
+      "label": [170, 590],
+      "city": [175, 640]
     },
     {
-      "id": "gasfeld", "name": "Gasfeld", "resource": "gas", "size": 3, "owner": "westland",
+      "id": "gasfeld", "name": "Gasfeld", "resource": "gas", "owner": "westland",
       "neighbors": ["mittelburg", "kohlental", "suedmark", "grenzland"],
       "outline": [[250, 500], [420, 470], [600, 520], [560, 670], [330, 690]],
-      "label": [440, 590]
+      "label": [440, 590],
+      "city": [440, 640]
     },
     {
-      "id": "grenzland", "name": "Grenzland", "resource": "coal", "size": 2, "owner": "ostmark",
+      "id": "grenzland", "name": "Grenzland", "resource": "coal", "owner": "ostmark",
       "neighbors": ["oelsenke", "gasfeld"],
       "outline": [[600, 520], [780, 480], [900, 500], [820, 690], [560, 670]],
-      "label": [730, 590]
+      "label": [730, 590],
+      "city": [730, 640]
     },
     {
-      "id": "nebelinsel", "name": "Nebelinsel", "resource": "fish", "size": 1, "owner": "nordreich",
+      "id": "nebelinsel", "name": "Nebelinsel", "resource": "fish", "owner": "nordreich",
       "neighbors": [],
       "outline": [[930, 110], [990, 100], [985, 210], [925, 200]],
-      "label": [957, 155]
+      "label": [957, 155],
+      "city": [957, 190]
     }
   ]
 }

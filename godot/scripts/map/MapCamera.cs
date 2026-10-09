@@ -2,7 +2,10 @@ using Godot;
 
 namespace TechDomination.Map;
 
-/// <summary>Kartenkamera: Zoom mit dem Mausrad (zum Mauszeiger hin), Verschieben mit gedrückter mittlerer oder rechter Maustaste.</summary>
+/// <summary>
+/// Kartenkamera: Zoom mit dem Mausrad (zum Mauszeiger hin), Verschieben mit gedrückter mittlerer oder rechter Maustaste.
+/// Ein Rechtsklick ohne Ziehen wird nicht verbraucht, damit er als Marschbefehl ankommt.
+/// </summary>
 public partial class MapCamera : Camera2D
 {
     private const float ZoomStep = 1.15f;
@@ -10,7 +13,13 @@ public partial class MapCamera : Camera2D
     private const float MaxZoom = 4f;
     private const float FitMargin = 0.9f;
 
-    private bool _dragging;
+    // Ab so vielen Pixeln Mausbewegung gilt ein gedrückter rechter Knopf als Ziehen statt als Klick.
+    private const float DragThreshold = 6f;
+
+    private bool _middleDragging;
+    private bool _rightPressed;
+    private bool _rightDragging;
+    private Vector2 _rightPressPosition;
 
     /// <summary>Zentriert die Kamera auf den Bereich und zoomt so, dass er vollständig sichtbar ist.</summary>
     public void FitTo(Rect2 area)
@@ -36,10 +45,35 @@ public partial class MapCamera : Camera2D
             case InputEventMouseButton { ButtonIndex: MouseButton.WheelDown, Pressed: true } wheel:
                 ZoomAt(wheel.Position, 1f / ZoomStep);
                 break;
-            case InputEventMouseButton { ButtonIndex: MouseButton.Middle or MouseButton.Right } button:
-                _dragging = button.Pressed;
+            case InputEventMouseButton { ButtonIndex: MouseButton.Middle } middle:
+                _middleDragging = middle.Pressed;
                 break;
-            case InputEventMouseMotion motion when _dragging:
+            case InputEventMouseButton { ButtonIndex: MouseButton.Right, Pressed: true } press:
+                _rightPressed = true;
+                _rightDragging = false;
+                _rightPressPosition = press.Position;
+                return;
+            case InputEventMouseButton { ButtonIndex: MouseButton.Right, Pressed: false }:
+                bool wasDragging = _rightDragging;
+                _rightPressed = false;
+                _rightDragging = false;
+                if (!wasDragging)
+                {
+                    return;
+                }
+
+                break;
+            case InputEventMouseMotion motion when _middleDragging || _rightPressed:
+                if (_rightPressed && !_rightDragging)
+                {
+                    if (motion.Position.DistanceTo(_rightPressPosition) < DragThreshold)
+                    {
+                        return;
+                    }
+
+                    _rightDragging = true;
+                }
+
                 Position -= motion.Relative / Zoom;
                 break;
             default:

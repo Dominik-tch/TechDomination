@@ -124,6 +124,12 @@ public static class SaveGameSerializer
                 && p.BuildingLevels.Select((level, i) => level >= 0 && level <= data.Buildings[i].MaxLevel).All(ok => ok)
                 && (p.Construction is not { } c
                     || (data.Contains(c.Building) && c.TargetLevel >= 1 && c.TargetLevel <= data.GetBuilding(c.Building).MaxLevel)))
+            && state.Armies.All(a => data.Contains(a.Owner)
+                && a.Units.Count == data.UnitTypes.Count
+                && a.Units.All(count => count >= 0)
+                && data.Graph.IsValid(a.Position)
+                && a.Legs.All(leg => data.Graph.AreConnected(leg.From, leg.To)
+                    && leg.StopAt > 0 && leg.StopAt <= data.Graph.Length(leg.From, leg.To)))
             && save.Session.SpeedLevel is not null
             && save.Session.PendingCommands is { } pending
             && pending.All(c => c?.Command is not null && c.ExecuteAtTick == state.Tick);

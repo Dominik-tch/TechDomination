@@ -80,21 +80,29 @@ public sealed record EconomyDefinition(
 /// <param name="Color">Farbe als <c>#RRGGBB</c>.</param>
 public sealed record NationDefinition(NationId Id, string Key, string Name, string Color);
 
+/// <summary>Einheitentyp aus units.json.</summary>
+/// <param name="Key">Lesbare ID aus der Datendatei.</param>
+/// <param name="Speed">Tempo in Tausendstel Karteneinheiten pro Tick (≥ 1).</param>
+/// <param name="Range">Reichweite in Tausendstel Karteneinheiten (0 = keine Fernwirkung). Wirkt ab dem Kampf (M8).</param>
+public sealed record UnitTypeDefinition(UnitTypeId Id, string Key, string Name, long Speed, long Range);
+
 /// <summary>Provinz aus map.json: unveränderliche Eigenschaften. Der Besitzer zur Laufzeit steht im Spielzustand.</summary>
 /// <param name="Key">Lesbare ID aus der Datendatei.</param>
 /// <param name="Resource">Der Basis-Rohstoff, den die Provinz produziert.</param>
-/// <param name="Size">Größe der Provinz (≥ 1). Bestimmt später die Bewegungsdauer.</param>
 /// <param name="StartOwner">Besitzer bei Spielbeginn.</param>
-/// <param name="Neighbors">Benachbarte Provinzen über Land, sortiert nach ID.</param>
+/// <param name="Neighbors">Benachbarte Provinzen über Land, sortiert nach ID. Ihre Städte sind über Pfade verbunden.</param>
 /// <param name="Outline">Umriss als Polygon in Kartenkoordinaten.</param>
 /// <param name="LabelPosition">Position des Provinznamens auf der Karte.</param>
+/// <param name="City">Position der Stadt, Knoten im Wegenetz.</param>
+/// <param name="StartArmy">Einheiten je Typ, die zu Spielbeginn in der Stadt stehen (Index = <see cref="UnitTypeId.Value"/>).</param>
 public sealed record ProvinceDefinition(
     ProvinceId Id,
     string Key,
     string Name,
     ResourceId Resource,
-    int Size,
     NationId StartOwner,
     IReadOnlyList<ProvinceId> Neighbors,
     IReadOnlyList<MapPoint> Outline,
-    MapPoint LabelPosition);
+    MapPoint LabelPosition,
+    MapPoint City,
+    IReadOnlyList<int> StartArmy);

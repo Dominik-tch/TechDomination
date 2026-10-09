@@ -23,6 +23,7 @@ public static class GameDataLoader
     public const string EconomyFileName = "economy.json";
     public const string BuildingsFileName = "buildings.json";
     public const string MarketFileName = "market.json";
+    public const string UnitsFileName = "units.json";
 
     // Prozentangaben mit bis zu 2 Nachkommastellen → Basispunkte (10 % = 1000).
     private const long BasisPointsPerPercent = 100;
@@ -46,13 +47,15 @@ public static class GameDataLoader
         var (speedLevels, defaultSpeedLevel) = LoadSpeedLevels(Parse<SimulationFile>(files, SimulationFileName));
         var resources = LoadResources(Parse<ResourcesFile>(files, ResourcesFileName));
         var nations = LoadNations(Parse<NationsFile>(files, NationsFileName));
-        var provinces = LoadProvinces(Parse<MapFile>(files, MapFileName), resources, nations);
+        var unitTypes = LoadUnitTypes(Parse<UnitsFile>(files, UnitsFileName));
+        var provinces = LoadProvinces(Parse<MapFile>(files, MapFileName), resources, nations, unitTypes);
         var economy = LoadEconomy(Parse<EconomyFile>(files, EconomyFileName), resources);
         var buildings = LoadBuildings(Parse<BuildingsFile>(files, BuildingsFileName), resources);
         var market = LoadMarket(Parse<MarketFile>(files, MarketFileName));
 
         return new GameData(
-            speedLevels, defaultSpeedLevel, economy, market, resources, nations, provinces, buildings, ComputeContentHash(files));
+            speedLevels, defaultSpeedLevel, economy, market, resources, nations, provinces, buildings, unitTypes,
+            ComputeContentHash(files));
     }
 
     /// <summary>
@@ -313,10 +316,35 @@ public static class GameDataLoader
         return nations;
     }
 
+    private static List<UnitTypeDefinition> LoadUnitTypes(UnitsFile file)
+    {
+        var entries = RequireEntries(file.Units, UnitsFileName, "units");
+        var keys = new HashSet<string>(StringComparer.Ordinal);
+        var unitTypes = new List<UnitTypeDefinition>(entries.Count);
+
+        foreach (var entry in entries)
+        {
+            string key = RequireKey(entry.Id, keys, UnitsFileName, "Einheit");
+            string context = $"Einheit '{key}'";
+            string name = RequireText(entry.Name, UnitsFileName, context, "name");
+            long speed = RequireAmount(entry.Speed, Map.FinePoint.Scale, UnitsFileName, context, "speed");
+            if (speed == 0)
+            {
+                throw Error(UnitsFileName, $"{context}: 'speed' muss größer als 0 sein.");
+            }
+
+            long range = entry.Range is null ? 0 : RequireAmount(entry.Range, Map.FinePoint.Scale, UnitsFileName, context, "range");
+            unitTypes.Add(new UnitTypeDefinition(new UnitTypeId(unitTypes.Count), key, name, speed, range));
+        }
+
+        return unitTypes;
+    }
+
     private static List<ProvinceDefinition> LoadProvinces(
         MapFile file,
         IReadOnlyList<ResourceDefinition> resources,
-        IReadOnlyList<NationDefinition> nations)
+        IReadOnlyList<NationDefinition> nations,
+        IReadOnlyList<UnitTypeDefinition> unitTypes)
     {
         var entries = RequireEntries(file.Provinces, MapFileName, "provinces");
 
@@ -351,12 +379,6 @@ public static class GameDataLoader
                 throw Error(MapFileName, $"{context}: '{resourceKey}' ist kein Basis-Rohstoff.");
             }
 
-            int size = entry.Size ?? throw Error(MapFileName, $"{context}: Feld 'size' fehlt.");
-            if (size < 1)
-            {
-                throw Error(MapFileName, $"{context}: 'size' muss mindestens 1 sein, ist aber {size}.");
-            }
-
             string ownerKey = RequireText(entry.Owner, MapFileName, context, "owner");
             if (!nationsByKey.TryGetValue(ownerKey, out var owner))
             {
@@ -366,9 +388,16 @@ public static class GameDataLoader
             var neighbors = LoadNeighbors(entry, key, context, idsByKey);
             var outline = LoadOutline(entry, context);
             var label = ToPoint(entry.Label, context, "label");
+            var city = ToPoint(entry.City, context, "city");
+            if (!Map.MapGeometry.Contains(outline, city))
+            {
+                throw Error(MapFileName, $"{context}: Die Stadt liegt nicht in der Provinz.");
+            }
+
+            var startArmy = LoadStartArmy(entry.StartArmy, unitTypes, context);
 
             provinces.Add(new ProvinceDefinition(
-                idsByKey[key], key, name, resource.Id, size, owner.Id, neighbors, outline, label));
+                idsByKey[key], key, name, resource.Id, owner.Id, neighbors, outline, label, city, startArmy));
         }
 
         RequireMutualNeighbors(provinces);
@@ -412,6 +441,25 @@ public static class GameDataLoader
         }
 
         return entry.Outline.Select(point => ToPoint(point, context, "outline")).ToList();
+    }
+
+    private static int[] LoadStartArmy(
+        Dictionary<string, int>? entries, IReadOnlyList<UnitTypeDefinition> unitTypes, string context)
+    {
+        var counts = new int[unitTypes.Count];
+        foreach (var (unitKey, count) in (entries ?? []).OrderBy(pair => pair.Key, StringComparer.Ordinal))
+        {
+            var unitType = unitTypes.FirstOrDefault(u => u.Key == unitKey)
+                ?? throw Error(MapFileName, $"{context}: 'startArmy' enthält unbekannte Einheit '{unitKey}'.");
+            if (count < 0)
+            {
+                throw Error(MapFileName, $"{context}: 'startArmy' – Anzahl von '{unitKey}' darf nicht negativ sein.");
+            }
+
+            counts[unitType.Id.Value] = count;
+        }
+
+        return counts;
     }
 
     private static void RequireMutualNeighbors(IReadOnlyList<ProvinceDefinition> provinces)

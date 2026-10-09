@@ -97,6 +97,14 @@ Der Inhalt wächst mit den Meilensteinen; die Tabelle ist der Zielstand für das
 
 ---
 
+### 3.4 Wegenetz und Positionen
+
+- Jede Provinz hat eine **Stadt** (Punkt in `map.json`). Benachbarte Städte sind über gerade **Pfade** verbunden; das Wegenetz ist ein Graph mit den Städten als Knoten.
+- Positionen auf dem Wegenetz werden in **Tausendstel Karteneinheiten** gerechnet (`long`), Pfadlängen über eine ganzzahlige Quadratwurzel – keine Gleitkommazahlen.
+- Eine **Position** ist entweder eine Stadt oder ein Punkt auf einem Pfad (`From`, `To`, Fortschritt ab `From`).
+- Ein **Marschbefehl** wird beim Ausführen in eine Folge von **Abschnitten** übersetzt (Pfad von Stadt zu Stadt, mit Haltepunkt). Die Bewegung arbeitet die Abschnitte Tick für Tick mit dem Tempo der langsamsten Einheit ab. Kürzeste Wege per Dijkstra mit fester Reihenfolge bei Gleichstand.
+- Die **Provinz einer Armee** ergibt sich aus ihrer Position (Punkt-in-Polygon); in der Stadt ist es immer die Provinz der Stadt.
+
 ## 4. Tick-System
 
 ### 4.1 Ablauf eines Ticks
@@ -306,7 +314,8 @@ Jeder Meilenstein endet mit grünem `dotnet test` und ist entweder in Godot spie
 | **M4** | Speichern/Laden lokal | `SaveGame`, Versionierung, Kompression, Speichern/Laden-Menü. Bewusst früh, damit jedes weitere Feature sofort speicherbar bleibt. | Kerntest „speichern-laden ≡ durchlaufen“. Spielbar: speichern, beenden, fortsetzen. |
 | **M5** | Gebäude | Bau, Bauzeit, Ausbaustufen, Wirkung (Produktionsbonus), Kosten. Erster Spieler-Command, `ICommandSink`. | Feature 4. |
 | **M6** | Wirtschaft II | Fabriken mit Rezepten, Markt (Kauf/Verkauf, Preisanstieg, Erholung), fortgeschrittene Güter, ~25 Ressourcen in `godot/data/`. | Feature 3 vollständig. |
-| **M7** | Armeen & Bewegung | Rekrutieren (kostet Güter), gemischte Stacks, Zusammenlegen/Teilen, Pfadsuche, Bewegung nach Provinzgröße und Einheitentyp, Interpolation zwischen Ticks. | Spielbar: Armeen über die Karte ziehen. Tests: Bewegungsdauer, Pfad. |
+| **M7a** | Wegenetz & Bewegung | Städte, Pfade, Einheitentypen mit Tempo, Armeen mit Positionen auf dem Wegenetz, Marschbefehl zu beliebigem Punkt, Anhalten und Umkehren, Start-Armeen als Platzhalter. | Spielbar: Armeen über das Wegenetz ziehen. Tests: Wege, Bewegungsdauer, Anhalten. |
+| **M7b** | Ausbildung & Unterhalt | Tage, automatische Infanterie, Ausbildungsaufträge, Kaserne und Fahrzeughangar, Zusammenlegen/Teilen, Unterhalt (Konserven, Treibstoff), Stärke. | Spielbar: Armeen aufstellen und versorgen. |
 | **M8** | Krieg & Kampf | Diplomatie (Krieg/Frieden), automatischer Kampf in Runden, Eroberung durch Einmarsch. | Features 5 + 6. Spielbar im Sandbox-Modus mit mehreren lokal umschaltbaren Nationen. |
 | **M9** | Partie-Rahmen & Sieg | Spielstart-Setup (Nationenwahl, Zeitlimit), Punkte, Sofortsieg, Zeitlimit-Sieg, Ende-Bildschirm. | Feature 7. Eine Partie hat Anfang und Ende. |
 | **M10** | KI | Eigener KI-RNG. Wirtschaft aufbauen, Militär aufbauen, Krieg führen. Vor dem Multiplayer, weil der Multiplayer die KI für Disconnects braucht. | Feature 9. **Erster vollständiger Einzelspieler.** Tests: KI-gegen-KI headless, reproduzierbar. |

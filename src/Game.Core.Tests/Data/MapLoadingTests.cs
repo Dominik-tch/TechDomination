@@ -14,7 +14,7 @@ public class MapLoadingTests
         Assert.Equal("b", b.Key);
         Assert.Equal("B", b.Name);
         Assert.Equal("fish", data.GetResource(b.Resource).Key);
-        Assert.Equal(2, b.Size);
+        Assert.Equal(new MapPoint(15, 5), b.City);
         Assert.Equal("blue", data.GetNation(b.StartOwner).Key);
         Assert.Equal(new MapPoint(15, 5), b.LabelPosition);
         Assert.Equal(
@@ -37,8 +37,8 @@ public class MapLoadingTests
         var map = TestData.Map();
         map["provinces"]!.AsArray().Add(JsonNode.Parse("""
             {
-              "id": "island", "name": "Insel", "resource": "fish", "size": 1, "owner": "red",
-              "outline": [[50, 50], [60, 50], [60, 60]], "label": [55, 55]
+              "id": "island", "name": "Insel", "resource": "fish", "owner": "red",
+              "outline": [[50, 50], [60, 50], [60, 60]], "label": [58, 55], "city": [58, 54]
             }
             """));
 
@@ -69,7 +69,7 @@ public class MapLoadingTests
     [Theory]
     [InlineData("name")]
     [InlineData("resource")]
-    [InlineData("size")]
+    [InlineData("city")]
     [InlineData("owner")]
     [InlineData("outline")]
     [InlineData("label")]
@@ -117,17 +117,47 @@ public class MapLoadingTests
         Assert.Contains("unbekannte Nation 'green'", error.Message);
     }
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-3)]
-    public void SizeBelowOne_Throws(int size)
+    [Fact]
+    public void CityOutsideProvince_Throws()
     {
         var map = TestData.Map();
-        TestData.Province(map, "a")["size"] = size;
+        TestData.Province(map, "a")["city"] = JsonNode.Parse("[15, 5]");
 
         var error = LoadFails(map);
 
-        Assert.Contains("'size'", error.Message);
+        Assert.Contains("Provinz 'a'", error.Message);
+        Assert.Contains("Stadt liegt nicht in der Provinz", error.Message);
+    }
+
+    [Fact]
+    public void StartArmy_IsLoadedPerUnitType()
+    {
+        var data = TestData.Load();
+
+        Assert.Equal([2, 0, 0], data.GetProvince(new ProvinceId(0)).StartArmy);
+        Assert.Equal([0, 0, 0], data.GetProvince(new ProvinceId(1)).StartArmy);
+    }
+
+    [Fact]
+    public void StartArmy_UnknownUnit_Throws()
+    {
+        var map = TestData.Map();
+        TestData.Province(map, "a")["startArmy"] = JsonNode.Parse("""{ "tanks": 1 }""");
+
+        var error = LoadFails(map);
+
+        Assert.Contains("unbekannte Einheit 'tanks'", error.Message);
+    }
+
+    [Fact]
+    public void StartArmy_NegativeCount_Throws()
+    {
+        var map = TestData.Map();
+        TestData.Province(map, "a")["startArmy"] = JsonNode.Parse("""{ "infantry": -1 }""");
+
+        var error = LoadFails(map);
+
+        Assert.Contains("nicht negativ", error.Message);
     }
 
     [Fact]

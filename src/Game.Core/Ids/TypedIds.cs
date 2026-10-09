@@ -47,6 +47,23 @@ public readonly record struct BuildingId(int Value) : ITypedId<BuildingId>
     public override string ToString() => $"Building#{Value}";
 }
 
+[JsonConverter(typeof(TypedIdJsonConverter<UnitTypeId>))]
+public readonly record struct UnitTypeId(int Value) : ITypedId<UnitTypeId>
+{
+    public static UnitTypeId FromValue(int value) => new(value);
+
+    public override string ToString() => $"UnitType#{Value}";
+}
+
+/// <summary>Eine Armee. IDs werden fortlaufend vergeben und nach Auflösung nicht wiederverwendet.</summary>
+[JsonConverter(typeof(TypedIdJsonConverter<ArmyId>))]
+public readonly record struct ArmyId(int Value) : ITypedId<ArmyId>
+{
+    public static ArmyId FromValue(int value) => new(value);
+
+    public override string ToString() => $"Army#{Value}";
+}
+
 /// <summary>Ein Spieler in der Session (Mensch am Host oder Client). Nicht dasselbe wie die Nation, die er steuert.</summary>
 [JsonConverter(typeof(TypedIdJsonConverter<PlayerId>))]
 public readonly record struct PlayerId(int Value) : ITypedId<PlayerId>

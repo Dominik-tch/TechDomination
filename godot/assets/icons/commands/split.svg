@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- Aufteilen: Gabelung (Platzhalter) -->
+  <path d="M10 32 H28 L44 18 M28 32 L44 46" fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <polygon points="40,10 54,14 46,26" fill="#FFFFFF"/>
+  <polygon points="40,54 54,50 46,38" fill="#FFFFFF"/>
+</svg>

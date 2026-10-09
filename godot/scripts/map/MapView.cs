@@ -18,9 +18,13 @@ public partial class MapView : Node2D
     private const float LabelHeight = 24f;
     private const float ResourceIconSize = 28f;
     private const float ResourceIconOffset = 26f;
+    private const float PathWidth = 2f;
+    private const float CitySize = 4f;
 
     private static readonly Color BorderColor = new(0.12f, 0.12f, 0.12f);
     private static readonly Color SelectionColor = new(1f, 0.85f, 0.2f);
+    private static readonly Color PathColor = new(0.95f, 0.92f, 0.8f, 0.7f);
+    private static readonly Color CityColor = new(0.1f, 0.1f, 0.1f);
 
     private readonly List<Polygon2D> _areas = [];
     private Color[] _nationColors = [];
@@ -49,6 +53,8 @@ public partial class MapView : Node2D
         {
             AddProvince(province);
         }
+
+        DrawNetwork(data);
 
         _selectionOutline = new Line2D
         {
@@ -88,6 +94,15 @@ public partial class MapView : Node2D
         var point = new MapPoint(Mathf.FloorToInt(local.X), Mathf.FloorToInt(local.Y));
         Select(MapGeometry.FindProvinceAt(data, point));
         GetViewport().SetInputAsHandled();
+    }
+
+    /// <summary>Hebt die Provinzauswahl auf, z. B. wenn eine Armee ausgewählt wird.</summary>
+    public void ClearSelection()
+    {
+        if (SelectedProvince is not null)
+        {
+            Select(null);
+        }
     }
 
     private void Select(ProvinceId? id)
@@ -149,6 +164,39 @@ public partial class MapView : Node2D
                 ZIndex = 2,
             });
         }
+    }
+
+    // Pfade als dünne Linien, Städte als kleine Quadrate.
+    private void DrawNetwork(GameData data)
+    {
+        foreach (var (a, b) in data.Graph.Edges)
+        {
+            AddChild(new Line2D
+            {
+                Points = [CityVector(data, a), CityVector(data, b)],
+                Width = PathWidth,
+                DefaultColor = PathColor,
+                ZIndex = 1,
+            });
+        }
+
+        foreach (var province in data.Provinces)
+        {
+            var city = CityVector(data, province.Id);
+            AddChild(new Polygon2D
+            {
+                Polygon = [new(-CitySize, -CitySize), new(CitySize, -CitySize), new(CitySize, CitySize), new(-CitySize, CitySize)],
+                Position = city,
+                Color = CityColor,
+                ZIndex = 2,
+            });
+        }
+    }
+
+    private static Vector2 CityVector(GameData data, ProvinceId province)
+    {
+        var city = data.GetProvince(province).City;
+        return new Vector2(city.X, city.Y);
     }
 
     private static Vector2[] ToVectors(IReadOnlyList<MapPoint> points) =>

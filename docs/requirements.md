@@ -58,10 +58,25 @@ Gebäude können in jeder Provinz gebaut werden und haben Ausbaustufen. Bauen ko
 **Fertig, wenn:** Bau, Bauzeit, Ausbau und Wirkung der Gebäude funktionieren.
 
 ### 5. Militär (nur Land)
-- Armeen sind **gemischte Stacks** aus mehreren Einheitentypen.
-- Bewegung entlang benachbarter Provinzen, Dauer abhängig von Provinzgröße und Einheitentyp.
+- Armeen sind **gemischte Stacks** aus mehreren Einheitentypen: Infanterie, Kavallerie, Artillerie und Motorisierte Infanterie (Militärwagen).
+- **Städte und Wegenetz** (wie in Supremacy 1914): Jede Provinz hat eine Stadt. Die Städte benachbarter Provinzen sind über Pfade verbunden (vorerst gerade Linien). Armeen bewegen sich frei auf diesen Pfaden, können an jeder Stelle anhalten – auch mitten auf einem Pfad – und jederzeit umkehren. Ein Marschbefehl zielt auf den nächstgelegenen Punkt im Wegenetz; die Armee nimmt den kürzesten Weg.
+- Die Bewegungsdauer ergibt sich aus der Pfadlänge und dem Tempo der langsamsten Einheit im Stack.
+- **Befehle für eine ausgewählte eigene Armee** (Befehlsleiste unten in der Mitte): **Bewegen** (Vorschau des Wegs zur Mausposition, Bestätigen per Klick; rastet an Städten und eigenen stehenden Armeen ein), **Aufteilen** (Schieberegler je Einheitentyp, dann Ziel der neuen Armee wählen; Abbruch lässt die Armee zusammen) und **Anhalten**. Ein Rechtsklick auf die Karte ist eine Abkürzung für einen sofortigen Marschbefehl.
+- Kommt eine Armee dort an, wo eine eigene stehende Armee steht, werden beide **zusammengeführt**.
+- Die Route einer Armee wird nach dem Bestätigen weiß-gelb gestrichelt mit Pfeil angezeigt, in der Vorschau gelb.
+- Eine Armee befindet sich in der Provinz, in deren Fläche ihre Position liegt.
+- Vorerst dürfen Armeen überall hinziehen.
+- **Artillerie** hat eine Reichweite und kann aus der Entfernung auf eine Stadt schießen (Kampf mit M8).
+- **Ausbildung:**
+  - Ein **Tag** dauert 10 Minuten Spielzeit bei Standardgeschwindigkeit (Wert in den Daten).
+  - **Infanterie** entsteht automatisch und kostenlos zum Tageswechsel in jeder Provinz: 1 Einheit, mit Kaserne 2. Das lässt sich weder auslösen noch verhindern.
+  - **Kavallerie** und **Artillerie** (benötigen eine Kaserne) sowie **Motorisierte Infanterie** (benötigt einen Fahrzeughangar) werden per Auftrag ausgebildet: Die Kosten werden sofort bezahlt, die Ausbildung dauert 1 Tag ab Auftrag. Pro Provinz wird immer nur eine Einheit gleichzeitig ausgebildet; weitere Aufträge warten in einer Schlange.
+  - **Kaserne:** keine Ausbaustufen; verdoppelt die automatische Infanterie und ermöglicht Kavallerie und Artillerie.
+  - **Fahrzeughangar:** keine Ausbaustufen; ermöglicht Motorisierte Infanterie, ohne Wirkung auf die Infanterie.
+  - Neue Einheiten erscheinen in der Stadt und werden einer dort stehenden eigenen Armee zugeschlagen.
 - **Kampf** läuft automatisch über Zeit, in Runden alle X Ticks, sobald feindliche Armeen in derselben Provinz sind.
-- **Laufender Verbrauch:** Armeen verbrauchen Konserven als Unterhalt, solange sie existieren; motorisierte Einheiten verbrauchen Treibstoff; Munition wird im Kampf verbraucht. Kriege kosten dadurch laufend Wirtschaftsleistung. Mengen und Takt werden mit M7/M8 festgelegt.
+- **Laufender Verbrauch:** Alle Einheiten verbrauchen dauerhaft Konserven als Unterhalt; Motorisierte Infanterie verbraucht zusätzlich dauerhaft Treibstoff, unabhängig davon, ob sie sich bewegt. Munition wird im Kampf verbraucht. Kriege kosten dadurch laufend Wirtschaftsleistung.
+- **Stärke:** Jeder Einheitentyp einer Armee hat eine Stärke von 0–100 %. Fehlt Unterhalt, sinkt sie pro Wirtschaftstakt um einen festen Wert; reicht der Vorrat nur teilweise, verlieren alle Armeen anteilig. Bei 0 % lösen sich die Einheiten auf. Beim Zusammenlegen wird die Stärke nach Anzahl gemittelt. Im Kampf (M8) wirkt die Stärke mit.
 - Provinzen werden durch Einmarsch erobert.
 
 **Fertig, wenn:** Armeen können aufgestellt, zusammengelegt/geteilt, bewegt werden, Kämpfe werden ausgetragen, Provinzen wechseln den Besitzer.
@@ -130,7 +145,6 @@ Diese Punkte werden bewusst **nicht** gebaut, solange sie nicht hier ergänzt we
 
 ## Offene Fragen
 
-- Welche Landeinheiten gibt es im MVP?
 - Wie viele Provinzen hat die Europakarte?
 - Startbedingungen: Nationenwahl, Startarmeen?
 - Was passiert mit Truppen in fremdem Gebiet bei Friedensschluss?

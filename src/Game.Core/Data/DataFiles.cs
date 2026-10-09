@@ -124,8 +124,6 @@ internal sealed class ProvinceEntry
 
     public string? Resource { get; set; }
 
-    public int? Size { get; set; }
-
     public string? Owner { get; set; }
 
     public List<string?>? Neighbors { get; set; }
@@ -133,4 +131,24 @@ internal sealed class ProvinceEntry
     public List<int[]?>? Outline { get; set; }
 
     public int[]? Label { get; set; }
+
+    public int[]? City { get; set; }
+
+    public Dictionary<string, int>? StartArmy { get; set; }
+}
+
+internal sealed class UnitsFile
+{
+    public List<UnitEntry?>? Units { get; set; }
+}
+
+internal sealed class UnitEntry
+{
+    public string? Id { get; set; }
+
+    public string? Name { get; set; }
+
+    public decimal? Speed { get; set; }
+
+    public decimal? Range { get; set; }
 }

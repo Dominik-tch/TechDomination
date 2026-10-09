@@ -1,0 +1,121 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/ArmyCommandBar.cs" id="1_bar"]
+[ext_resource type="Texture2D" path="res://assets/icons/commands/move.svg" id="2_move"]
+[ext_resource type="Texture2D" path="res://assets/icons/commands/split.svg" id="3_split"]
+[ext_resource type="Texture2D" path="res://assets/icons/commands/halt.svg" id="4_halt"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_round"]
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(0.13, 0.14, 0.16, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.85, 0.85, 0.85, 1)
+corner_radius_top_left = 26
+corner_radius_top_right = 26
+corner_radius_bottom_right = 26
+corner_radius_bottom_left = 26
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_round_hover"]
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(0.25, 0.27, 0.3, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.85, 0.2, 1)
+corner_radius_top_left = 26
+corner_radius_top_right = 26
+corner_radius_bottom_right = 26
+corner_radius_bottom_left = 26
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_round_disabled"]
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(0.13, 0.14, 0.16, 0.6)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.4, 0.4, 0.4, 1)
+corner_radius_top_left = 26
+corner_radius_top_right = 26
+corner_radius_bottom_right = 26
+corner_radius_bottom_left = 26
+
+[node name="ArmyCommandBar" type="VBoxContainer"]
+visible = false
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -110.0
+offset_right = 150.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 0
+alignment = 2
+script = ExtResource("1_bar")
+
+[node name="HintLabel" type="Label" parent="."]
+visible = false
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+horizontal_alignment = 1
+
+[node name="Buttons" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="MoveButton" type="Button" parent="Buttons"]
+custom_minimum_size = Vector2(52, 52)
+layout_mode = 2
+tooltip_text = "Bewegen"
+focus_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_round")
+theme_override_styles/hover = SubResource("StyleBoxFlat_round_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_round_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_round_disabled")
+icon = ExtResource("2_move")
+icon_alignment = 1
+expand_icon = true
+
+[node name="SplitButton" type="Button" parent="Buttons"]
+custom_minimum_size = Vector2(52, 52)
+layout_mode = 2
+tooltip_text = "Aufteilen"
+focus_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_round")
+theme_override_styles/hover = SubResource("StyleBoxFlat_round_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_round_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_round_disabled")
+icon = ExtResource("3_split")
+icon_alignment = 1
+expand_icon = true
+
+[node name="HaltButton" type="Button" parent="Buttons"]
+custom_minimum_size = Vector2(52, 52)
+layout_mode = 2
+tooltip_text = "Anhalten"
+focus_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_round")
+theme_override_styles/hover = SubResource("StyleBoxFlat_round_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_round_hover")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_round_disabled")
+icon = ExtResource("4_halt")
+icon_alignment = 1
+expand_icon = true

@@ -12,12 +12,19 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/Notifications.tscn" id="10_notifications"]
 [ext_resource type="PackedScene" path="res://scenes/ui/EconomyWindow.tscn" id="11_economy"]
 [ext_resource type="PackedScene" path="res://scenes/ui/WindowButtons.tscn" id="12_buttons"]
+[ext_resource type="Script" path="res://scripts/map/ArmyLayer.cs" id="13_armies"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ArmyPanel.tscn" id="14_army_panel"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ArmyCommandBar.tscn" id="15_command_bar"]
+[ext_resource type="PackedScene" path="res://scenes/ui/SplitDialog.tscn" id="16_split_dialog"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
 
 [node name="MapView" type="Node2D" parent="."]
 script = ExtResource("2_map")
+
+[node name="ArmyLayer" type="Node2D" parent="."]
+script = ExtResource("13_armies")
 
 [node name="MapCamera" type="Camera2D" parent="."]
 script = ExtResource("3_camera")
@@ -71,6 +78,12 @@ layout_mode = 2
 [node name="TimeControls" parent="Hud" instance=ExtResource("6_time")]
 
 [node name="ResourceBar" parent="Hud" instance=ExtResource("7_bar")]
+
+[node name="ArmyPanel" parent="Hud" instance=ExtResource("14_army_panel")]
+
+[node name="ArmyCommandBar" parent="Hud" instance=ExtResource("15_command_bar")]
+
+[node name="SplitDialog" parent="Hud" instance=ExtResource("16_split_dialog")]
 
 [node name="Notifications" parent="Hud" instance=ExtResource("10_notifications")]
 

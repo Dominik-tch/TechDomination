@@ -46,6 +46,36 @@ public class GameStateFactoryTests
     }
 
     [Fact]
+    public void CreateNew_PlacesStartArmiesInCities()
+    {
+        var state = GameStateFactory.CreateNew(TestData.Load(), seed: 1);
+
+        Assert.Equal(2, state.Armies.Count);
+        var red = state.FindArmy(TestIds.RedArmy)!;
+        Assert.Equal(TestIds.Red, red.Owner);
+        Assert.Equal(Game.Core.Map.PathPosition.AtCity(TestIds.A), red.Position);
+        Assert.Equal([2, 0, 0], red.Units);
+        Assert.False(red.IsMoving);
+        Assert.Equal(TestIds.Blue, state.FindArmy(TestIds.BlueArmy)!.Owner);
+        Assert.Equal(2, state.NextArmyId);
+    }
+
+    [Fact]
+    public void Constructor_RejectsArmyIdsNotBelowNextId()
+    {
+        var army = new ArmyState(new ArmyId(3), TestIds.Red, Game.Core.Map.PathPosition.AtCity(TestIds.A), [1, 0, 0], []);
+
+        Assert.Throws<ArgumentException>(
+            () => new GameState(1, 0, Game.Core.Determinism.DeterministicRandom.FromSeed(1), [], [], [army], 3));
+    }
+
+    [Fact]
+    public void FindArmy_UnknownId_IsNull()
+    {
+        Assert.Null(GameStateFactory.CreateNew(TestData.Load(), seed: 1).FindArmy(new ArmyId(42)));
+    }
+
+    [Fact]
     public void GetProvince_ReturnsStateById()
     {
         var state = GameStateFactory.CreateNew(TestData.Load(), seed: 1);
@@ -63,7 +93,7 @@ public class GameStateFactoryTests
         };
 
         Assert.Throws<ArgumentException>(
-            () => new GameState(1, 0, Game.Core.Determinism.DeterministicRandom.FromSeed(1), [], provinces));
+            () => new GameState(1, 0, Game.Core.Determinism.DeterministicRandom.FromSeed(1), [], provinces, [], 0));
     }
 
     [Fact]
@@ -72,7 +102,7 @@ public class GameStateFactoryTests
         var nations = new List<NationState> { new(new NationId(1), 0, [], [], [], []), new(new NationId(0), 0, [], [], [], []) };
 
         Assert.Throws<ArgumentException>(
-            () => new GameState(1, 0, Game.Core.Determinism.DeterministicRandom.FromSeed(1), nations, []));
+            () => new GameState(1, 0, Game.Core.Determinism.DeterministicRandom.FromSeed(1), nations, [], [], 0));
     }
 
     [Fact]

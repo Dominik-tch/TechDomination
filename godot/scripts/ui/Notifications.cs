@@ -47,6 +47,9 @@ public partial class Notifications : VBoxContainer
         }
     }
 
+    /// <summary>Zeigt sofort eine Meldung, z. B. wenn ein Befehl schon vor dem Absenden ungültig ist.</summary>
+    public void Show(string message) => Add(message);
+
     private void Add(string message)
     {
         var entry = new PanelContainer { MouseFilter = MouseFilterEnum.Ignore };

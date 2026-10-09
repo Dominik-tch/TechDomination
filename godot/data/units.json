@@ -1,0 +1,14 @@
+{
+  // Einheitentypen. Alle Werte sind Platzhalter fürs Balancing.
+  // "speed" = Karteneinheiten pro Tick (höchstens 3 Nachkommastellen). Eine Armee zieht mit dem Tempo ihrer
+  // langsamsten Einheit. Auf der Testkarte sind benachbarte Städte etwa 200–250 Einheiten entfernt:
+  // Infanterie mit 0,085 braucht dafür im Schnitt ~2800 Ticks, also gut 4,5 Minuten bei "normal" (10 Ticks/s).
+  // "range" = Reichweite in Karteneinheiten (wirkt ab dem Kampf in M8).
+  // Kosten, Ausbildung und Unterhalt kommen mit M7b.
+  "units": [
+    { "id": "infantry", "name": "Infanterie", "speed": 0.085 },
+    { "id": "cavalry", "name": "Kavallerie", "speed": 0.16 },
+    { "id": "artillery", "name": "Artillerie", "speed": 0.06, "range": 150 },
+    { "id": "motorized", "name": "Motorisierte Infanterie", "speed": 0.2 }
+  ]
+}

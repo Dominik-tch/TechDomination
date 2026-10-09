@@ -8,7 +8,7 @@ public static class GameStateFactory
 {
     /// <summary>
     /// Neuer Zustand bei Tick 0: Start-Besitzer aus der Karte, Startgeld und Startbestände aus economy.json,
-    /// Marktpreise auf Basispreis, alle Fabriken ohne Begrenzung.
+    /// Marktpreise auf Basispreis, alle Fabriken ohne Begrenzung, Start-Armeen aus map.json.
     /// Gleiche Daten und gleicher Seed ergeben denselben Zustand.
     /// </summary>
     public static GameState CreateNew(GameData data, ulong seed)
@@ -30,6 +30,14 @@ public static class GameStateFactory
             .Select(province => new ProvinceState(province.Id, province.StartOwner, new int[data.Buildings.Count], null))
             .ToList();
 
-        return new GameState(seed, tick: 0, DeterministicRandom.FromSeed(seed), nations, provinces);
+        var state = new GameState(seed, tick: 0, DeterministicRandom.FromSeed(seed), nations, provinces, [], nextArmyId: 0);
+
+        // Start-Armeen stehen in der Stadt und gehören dem Start-Besitzer (Platzhalter bis zum Spielstart-Setup in M9).
+        foreach (var province in data.Provinces.Where(p => p.StartArmy.Any(count => count > 0)))
+        {
+            state.CreateArmy(province.StartOwner, Map.PathPosition.AtCity(province.Id), province.StartArmy);
+        }
+
+        return state;
     }
 }

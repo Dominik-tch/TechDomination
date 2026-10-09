@@ -48,4 +48,12 @@ internal static class TestIds
     public static readonly ResourceId Wood = new(0);
     public static readonly ResourceId Fish = new(1);
     public static readonly ResourceId Rails = new(2);
+
+    public static readonly UnitTypeId Infantry = new(0);
+    public static readonly UnitTypeId Cavalry = new(1);
+    public static readonly UnitTypeId Artillery = new(2);
+
+    /// <summary>Start-Armeen der Testdaten: Rot in a, Blau in c.</summary>
+    public static readonly ArmyId RedArmy = new(0);
+    public static readonly ArmyId BlueArmy = new(1);
 }

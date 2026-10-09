@@ -8,8 +8,10 @@ namespace Game.Core.Tests;
 /// Die Builder liefern veränderbare JSON-Objekte, damit Tests gezielt einzelne Felder ändern können.
 /// </summary>
 /// <remarks>
-/// Testkarte: drei Provinzen in einer Reihe, a | b | c, je 10×10 Einheiten.
-/// a gehört "red", b und c gehören "blue". a und c produzieren Holz (1,5/Takt), b Fisch (0,25/Takt).
+/// Testkarte: drei Provinzen in einer Reihe, a | b | c, je 10×10 Einheiten, Städte in der Mitte
+/// (5,5), (15,5), (25,5) – benachbarte Städte sind also 10 Einheiten = 10 000 Tausendstel entfernt.
+/// a gehört "red", b und c gehören "blue". Start-Armeen: 2 Infanterie in a (Rot), 1 Kavallerie in c (Blau).
+/// Einheiten: Infanterie 1 Einheit/Tick, Kavallerie 2,5, Artillerie 0,5 mit Reichweite 8. a und c produzieren Holz (1,5/Takt), b Fisch (0,25/Takt).
 /// Wirtschaftstakt: 4 Ticks, Steuern 2,50 pro Provinz und Takt.
 /// Gebäude "mine": +10 % je Stufe, 2 Stufen. Stufe 1: 10 Geld, 2 Holz, 3 Ticks. Stufe 2: 20 Geld, 4 Holz, 0,5 Fisch, 5 Ticks.
 /// Fabrik "railworks": 2 Holz + 0,5 Fisch → 1 Schiene, 2 Stufen. Fabrik "carpentry": 3 Holz → 1 Schiene, 1 Stufe.
@@ -52,16 +54,19 @@ internal static class TestData
         {
           "provinces": [
             {
-              "id": "a", "name": "A", "resource": "wood", "size": 1, "owner": "red",
-              "neighbors": ["b"], "outline": [[0, 0], [10, 0], [10, 10], [0, 10]], "label": [5, 5]
+              "id": "a", "name": "A", "resource": "wood", "owner": "red",
+              "neighbors": ["b"], "outline": [[0, 0], [10, 0], [10, 10], [0, 10]], "label": [5, 5],
+              "city": [5, 5], "startArmy": { "infantry": 2 }
             },
             {
-              "id": "b", "name": "B", "resource": "fish", "size": 2, "owner": "blue",
-              "neighbors": ["c", "a"], "outline": [[10, 0], [20, 0], [20, 10], [10, 10]], "label": [15, 5]
+              "id": "b", "name": "B", "resource": "fish", "owner": "blue",
+              "neighbors": ["c", "a"], "outline": [[10, 0], [20, 0], [20, 10], [10, 10]], "label": [15, 5],
+              "city": [15, 5]
             },
             {
-              "id": "c", "name": "C", "resource": "wood", "size": 3, "owner": "blue",
-              "neighbors": ["b"], "outline": [[20, 0], [30, 0], [30, 10], [20, 10]], "label": [25, 5]
+              "id": "c", "name": "C", "resource": "wood", "owner": "blue",
+              "neighbors": ["b"], "outline": [[20, 0], [30, 0], [30, 10], [20, 10]], "label": [25, 5],
+              "city": [25, 5], "startArmy": { "cavalry": 1 }
             }
           ]
         }
@@ -106,6 +111,16 @@ internal static class TestData
         }
         """);
 
+    public static JsonObject Units() => Parse("""
+        {
+          "units": [
+            { "id": "infantry", "name": "Infanterie", "speed": 1 },
+            { "id": "cavalry", "name": "Kavallerie", "speed": 2.5 },
+            { "id": "artillery", "name": "Artillerie", "speed": 0.5, "range": 8 }
+          ]
+        }
+        """);
+
     public static JsonObject Market() => Parse("""
         {
           "priceChangePercentPerUnit": 10,
@@ -123,7 +138,8 @@ internal static class TestData
         JsonObject? map = null,
         JsonObject? economy = null,
         JsonObject? buildings = null,
-        JsonObject? market = null) => new(StringComparer.Ordinal)
+        JsonObject? market = null,
+        JsonObject? units = null) => new(StringComparer.Ordinal)
     {
         [GameDataLoader.SimulationFileName] = (simulation ?? Simulation()).ToJsonString(),
         [GameDataLoader.ResourcesFileName] = (resources ?? Resources()).ToJsonString(),
@@ -132,6 +148,7 @@ internal static class TestData
         [GameDataLoader.EconomyFileName] = (economy ?? Economy()).ToJsonString(),
         [GameDataLoader.BuildingsFileName] = (buildings ?? Buildings()).ToJsonString(),
         [GameDataLoader.MarketFileName] = (market ?? Market()).ToJsonString(),
+        [GameDataLoader.UnitsFileName] = (units ?? Units()).ToJsonString(),
     };
 
     public static GameData Load() => GameDataLoader.Load(Files());

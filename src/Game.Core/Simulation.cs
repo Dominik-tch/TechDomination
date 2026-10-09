@@ -17,6 +17,7 @@ public static class Simulation
         new ConstructionSystem(),
         new TaxSystem(),
         new MarketSystem(),
+        new MovementSystem(),
     ];
 
     /// <summary>

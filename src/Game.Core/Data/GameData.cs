@@ -12,6 +12,7 @@ public sealed class GameData
         IReadOnlyList<NationDefinition> nations,
         IReadOnlyList<ProvinceDefinition> provinces,
         IReadOnlyList<BuildingDefinition> buildings,
+        IReadOnlyList<UnitTypeDefinition> unitTypes,
         string contentHash)
     {
         SpeedLevels = speedLevels;
@@ -22,6 +23,8 @@ public sealed class GameData
         Nations = nations;
         Provinces = provinces;
         Buildings = buildings;
+        UnitTypes = unitTypes;
+        Graph = new Map.MapGraph(provinces);
         ContentHash = contentHash;
     }
 
@@ -47,6 +50,12 @@ public sealed class GameData
     /// <summary>Alle Gebäudetypen, Index = <see cref="BuildingId.Value"/>.</summary>
     public IReadOnlyList<BuildingDefinition> Buildings { get; }
 
+    /// <summary>Alle Einheitentypen, Index = <see cref="UnitTypeId.Value"/>.</summary>
+    public IReadOnlyList<UnitTypeDefinition> UnitTypes { get; }
+
+    /// <summary>Wegenetz aus Städten und Pfaden.</summary>
+    public Map.MapGraph Graph { get; }
+
     /// <summary>SHA-256 über alle Datendateien. Erkennt abweichende Regelwerke bei Spielständen und Netzwerk-Beitritt.</summary>
     public string ContentHash { get; }
 
@@ -61,6 +70,8 @@ public sealed class GameData
     public ProvinceDefinition GetProvince(ProvinceId id) => Provinces[id.Value];
 
     public BuildingDefinition GetBuilding(BuildingId id) => Buildings[id.Value];
+
+    public UnitTypeDefinition GetUnitType(UnitTypeId id) => UnitTypes[id.Value];
 
     public bool Contains(ProvinceId id) => id.Value >= 0 && id.Value < Provinces.Count;
 

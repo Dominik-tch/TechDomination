@@ -20,6 +20,9 @@ public static class CommandTypes
         Register<BuyResourceCommand>("buyResource");
         Register<SellResourceCommand>("sellResource");
         Register<SetFactoryActivityCommand>("setFactoryActivity");
+        Register<MoveArmyCommand>("moveArmy");
+        Register<HaltArmyCommand>("haltArmy");
+        Register<SplitArmyCommand>("splitArmy");
     }
 
     /// <summary>Name des registrierten Command-Typs.</summary>

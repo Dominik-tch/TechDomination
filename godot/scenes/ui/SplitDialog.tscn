@@ -1,0 +1,58 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/SplitDialog.cs" id="1_split"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dialog"]
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(0.13, 0.14, 0.16, 0.97)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="SplitDialog" type="PanelContainer"]
+visible = false
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -240.0
+offset_top = -300.0
+offset_right = 240.0
+offset_bottom = -130.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_dialog")
+script = ExtResource("1_split")
+
+[node name="Content" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Content"]
+layout_mode = 2
+text = "Armee aufteilen – wie viele gehen in die neue Armee?"
+
+[node name="Rows" type="VBoxContainer" parent="Content"]
+layout_mode = 2
+
+[node name="SummaryLabel" type="Label" parent="Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+
+[node name="Buttons" type="HBoxContainer" parent="Content"]
+layout_mode = 2
+alignment = 2
+
+[node name="CancelButton" type="Button" parent="Content/Buttons"]
+layout_mode = 2
+focus_mode = 0
+text = "Abbrechen"
+
+[node name="OkButton" type="Button" parent="Content/Buttons"]
+layout_mode = 2
+focus_mode = 0
+text = "OK – Ziel wählen"
