@@ -27,7 +27,7 @@ public static class GameStateFactory
             .ToList();
 
         var provinces = data.Provinces
-            .Select(province => new ProvinceState(province.Id, province.StartOwner, new int[data.Buildings.Count], null))
+            .Select(province => new ProvinceState(province.Id, province.StartOwner, new int[data.Buildings.Count], null, [], 0))
             .ToList();
 
         var state = new GameState(seed, tick: 0, DeterministicRandom.FromSeed(seed), nations, provinces, [], nextArmyId: 0);

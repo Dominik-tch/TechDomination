@@ -6,5 +6,8 @@
     { "id": "normal", "name": "Normal", "ticksPerSecond": 10 },
     { "id": "fast", "name": "Schnell", "ticksPerSecond": 20 }
   ],
-  "defaultSpeedLevel": "normal"
+  "defaultSpeedLevel": "normal",
+
+  // Länge eines Spieltags in Ticks (6000 = 10 Minuten bei "normal"). Zum Tageswechsel entsteht die automatische Infanterie.
+  "ticksPerDay": 6000
 }

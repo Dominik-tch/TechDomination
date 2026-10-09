@@ -46,7 +46,7 @@ public partial class ArmyPanel : PanelContainer
         _titleLabel.Text = $"Armee von {data.GetNation(army.Owner).Name}";
         _unitsLabel.Text = string.Join("\n", data.UnitTypes
             .Where(u => army.GetUnits(u.Id) > 0)
-            .Select(u => $"{u.Name}: {army.GetUnits(u.Id)}"));
+            .Select(u => $"{u.Name}: {army.GetUnits(u.Id)} ({army.GetStrength(u.Id) / 100} %)"));
 
         string place = data.GetProvince(ArmyRules.ProvinceOf(data, army)).Name;
         bool hasPendingOrder = session.PendingCommands.Any(e => e.Command switch

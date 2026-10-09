@@ -11,6 +11,7 @@ public partial class ProvinceInfoPanel : PanelContainer
     private Label _ownerLabel = null!;
     private Label _resourceLabel = null!;
     private BuildingsSection _buildingsSection = null!;
+    private TrainingSection _trainingSection = null!;
     private SimulationDriver _driver = null!;
     private ProvinceId? _province;
 
@@ -20,6 +21,7 @@ public partial class ProvinceInfoPanel : PanelContainer
         _ownerLabel = GetNode<Label>("Content/OwnerLabel");
         _resourceLabel = GetNode<Label>("Content/ResourceLabel");
         _buildingsSection = GetNode<BuildingsSection>("Content/BuildingsSection");
+        _trainingSection = GetNode<TrainingSection>("Content/TrainingSection");
         _driver = GetNode<SimulationDriver>("/root/SimulationDriver");
         Visible = false;
     }
@@ -28,6 +30,7 @@ public partial class ProvinceInfoPanel : PanelContainer
     {
         _province = province;
         _buildingsSection.Province = province;
+        _trainingSection.Province = province;
         Visible = province is not null;
         Refresh();
     }

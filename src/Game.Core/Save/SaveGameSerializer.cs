@@ -121,12 +121,16 @@ public static class SaveGameSerializer
                 && n.LastFactoryRuns.Count == data.Buildings.Count)
             && state.Provinces.All(p => data.Contains(p.Owner)
                 && p.BuildingLevels.Count == data.Buildings.Count
+                && p.TrainingQueue.All(t => t.Value >= 0 && t.Value < data.UnitTypes.Count && data.UnitTypes[t.Value].IsTrainable)
+                && p.TrainingRemainingTicks >= 0
                 && p.BuildingLevels.Select((level, i) => level >= 0 && level <= data.Buildings[i].MaxLevel).All(ok => ok)
                 && (p.Construction is not { } c
                     || (data.Contains(c.Building) && c.TargetLevel >= 1 && c.TargetLevel <= data.GetBuilding(c.Building).MaxLevel)))
             && state.Armies.All(a => data.Contains(a.Owner)
                 && a.Units.Count == data.UnitTypes.Count
                 && a.Units.All(count => count >= 0)
+                && a.Strength.Count == data.UnitTypes.Count
+                && a.Strength.All(s => s > 0 && s <= State.ArmyState.FullStrength)
                 && data.Graph.IsValid(a.Position)
                 && a.Legs.All(leg => data.Graph.AreConnected(leg.From, leg.To)
                     && leg.StopAt > 0 && leg.StopAt <= data.Graph.Length(leg.From, leg.To)))

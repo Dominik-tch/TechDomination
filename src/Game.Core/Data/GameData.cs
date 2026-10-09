@@ -4,6 +4,7 @@ namespace Game.Core.Data;
 public sealed class GameData
 {
     internal GameData(
+        int ticksPerDay,
         IReadOnlyList<SpeedLevelDefinition> speedLevels,
         SpeedLevelDefinition defaultSpeedLevel,
         EconomyDefinition economy,
@@ -15,6 +16,7 @@ public sealed class GameData
         IReadOnlyList<UnitTypeDefinition> unitTypes,
         string contentHash)
     {
+        TicksPerDay = ticksPerDay;
         SpeedLevels = speedLevels;
         DefaultSpeedLevel = defaultSpeedLevel;
         Economy = economy;
@@ -27,6 +29,9 @@ public sealed class GameData
         Graph = new Map.MapGraph(provinces);
         ContentHash = contentHash;
     }
+
+    /// <summary>Länge eines Spieltags in Ticks. Zum Tageswechsel entsteht die automatische Infanterie.</summary>
+    public int TicksPerDay { get; }
 
     /// <summary>Geschwindigkeitsstufen in der Reihenfolge der Datei.</summary>
     public IReadOnlyList<SpeedLevelDefinition> SpeedLevels { get; }

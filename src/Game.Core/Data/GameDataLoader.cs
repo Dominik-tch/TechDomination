@@ -44,17 +44,24 @@ public static class GameDataLoader
     {
         ArgumentNullException.ThrowIfNull(files);
 
-        var (speedLevels, defaultSpeedLevel) = LoadSpeedLevels(Parse<SimulationFile>(files, SimulationFileName));
+        var simulation = Parse<SimulationFile>(files, SimulationFileName);
+        var (speedLevels, defaultSpeedLevel) = LoadSpeedLevels(simulation);
+        int ticksPerDay = simulation.TicksPerDay ?? throw Error(SimulationFileName, "Feld 'ticksPerDay' fehlt.");
+        if (ticksPerDay < 1)
+        {
+            throw Error(SimulationFileName, $"'ticksPerDay' muss mindestens 1 sein, ist aber {ticksPerDay}.");
+        }
+
         var resources = LoadResources(Parse<ResourcesFile>(files, ResourcesFileName));
         var nations = LoadNations(Parse<NationsFile>(files, NationsFileName));
-        var unitTypes = LoadUnitTypes(Parse<UnitsFile>(files, UnitsFileName));
+        var buildings = LoadBuildings(Parse<BuildingsFile>(files, BuildingsFileName), resources);
+        var unitTypes = LoadUnitTypes(Parse<UnitsFile>(files, UnitsFileName), resources, buildings);
         var provinces = LoadProvinces(Parse<MapFile>(files, MapFileName), resources, nations, unitTypes);
         var economy = LoadEconomy(Parse<EconomyFile>(files, EconomyFileName), resources);
-        var buildings = LoadBuildings(Parse<BuildingsFile>(files, BuildingsFileName), resources);
         var market = LoadMarket(Parse<MarketFile>(files, MarketFileName));
 
         return new GameData(
-            speedLevels, defaultSpeedLevel, economy, market, resources, nations, provinces, buildings, unitTypes,
+            ticksPerDay, speedLevels, defaultSpeedLevel, economy, market, resources, nations, provinces, buildings, unitTypes,
             ComputeContentHash(files));
     }
 
@@ -170,7 +177,11 @@ public static class GameDataLoader
             throw Error(EconomyFileName, $"'factoryCycleIntervals' muss mindestens 1 sein, ist aber {factoryCycle}.");
         }
 
-        return new EconomyDefinition(intervalTicks, taxPerProvince, startMoney, startResources, factoryCycle);
+        long shortageLoss = file.ShortageStrengthLossPercent is null
+            ? 0
+            : RequireAmount(file.ShortageStrengthLossPercent, BasisPointsPerPercent, EconomyFileName, context, "shortageStrengthLossPercent");
+
+        return new EconomyDefinition(intervalTicks, taxPerProvince, startMoney, startResources, factoryCycle, shortageLoss);
     }
 
     private static List<BuildingDefinition> LoadBuildings(BuildingsFile file, IReadOnlyList<ResourceDefinition> resources)
@@ -208,7 +219,13 @@ public static class GameDataLoader
                 levels.Add(new BuildingLevelDefinition(money, costs, buildTicks));
             }
 
-            buildings.Add(new BuildingDefinition(new BuildingId(buildings.Count), key, name, levels, bonus, recipe));
+            int dailyUnitsBonus = entry.DailyUnitsBonus ?? 0;
+            if (dailyUnitsBonus < 0)
+            {
+                throw Error(BuildingsFileName, $"{context}: 'dailyUnitsBonus' darf nicht negativ sein.");
+            }
+
+            buildings.Add(new BuildingDefinition(new BuildingId(buildings.Count), key, name, levels, bonus, recipe, dailyUnitsBonus));
         }
 
         return buildings;
@@ -316,7 +333,8 @@ public static class GameDataLoader
         return nations;
     }
 
-    private static List<UnitTypeDefinition> LoadUnitTypes(UnitsFile file)
+    private static List<UnitTypeDefinition> LoadUnitTypes(
+        UnitsFile file, IReadOnlyList<ResourceDefinition> resources, IReadOnlyList<BuildingDefinition> buildings)
     {
         var entries = RequireEntries(file.Units, UnitsFileName, "units");
         var keys = new HashSet<string>(StringComparer.Ordinal);
@@ -334,7 +352,35 @@ public static class GameDataLoader
             }
 
             long range = entry.Range is null ? 0 : RequireAmount(entry.Range, Map.FinePoint.Scale, UnitsFileName, context, "range");
-            unitTypes.Add(new UnitTypeDefinition(new UnitTypeId(unitTypes.Count), key, name, speed, range));
+
+            int daily = entry.DailyPerProvince ?? 0;
+            int trainingTicks = entry.TrainingTicks ?? 0;
+            if (daily < 0 || trainingTicks < 0)
+            {
+                throw Error(UnitsFileName, $"{context}: 'dailyPerProvince' und 'trainingTicks' dürfen nicht negativ sein.");
+            }
+
+            if (daily == 0 && trainingTicks == 0)
+            {
+                throw Error(UnitsFileName, $"{context}: braucht 'dailyPerProvince' (automatisch) oder 'trainingTicks' (per Auftrag).");
+            }
+
+            long costMoney = entry.Cost?.Money is null
+                ? 0
+                : RequireAmount(entry.Cost.Money, Quantities.MoneyScale, UnitsFileName, context, "cost.money");
+            var costResources = LoadResourceAmounts(entry.Cost?.Resources, resources, UnitsFileName, $"{context}, 'cost.resources'");
+            var upkeep = LoadResourceAmounts(entry.Upkeep, resources, UnitsFileName, $"{context}, 'upkeep'");
+
+            BuildingId? required = null;
+            if (entry.Requires is { } requiredKey)
+            {
+                required = buildings.FirstOrDefault(b => b.Key == requiredKey)?.Id
+                    ?? throw Error(UnitsFileName, $"{context}: unbekanntes Gebäude '{requiredKey}' in 'requires'.");
+            }
+
+            unitTypes.Add(new UnitTypeDefinition(
+                new UnitTypeId(unitTypes.Count), key, name, speed, range,
+                daily, trainingTicks, costMoney, costResources, required, upkeep));
         }
 
         return unitTypes;

@@ -42,9 +42,34 @@ public static class EconomyRules
     // 10 000 Basispunkte = 100 %.
     private const long BasisPointsPerWhole = 10_000;
 
+    /// <summary>Unterhalt aller Armeen der Nation pro Wirtschaftstakt in Tausendstel, Index = <see cref="ResourceId.Value"/>.</summary>
+    public static long[] UpkeepPerInterval(GameState state, GameData data, NationId nation)
+    {
+        var upkeep = new long[data.Resources.Count];
+        foreach (var army in state.Armies)
+        {
+            if (army.Owner != nation)
+            {
+                continue;
+            }
+
+            foreach (var unitType in data.UnitTypes)
+            {
+                int count = army.GetUnits(unitType.Id);
+                for (int r = 0; r < upkeep.Length && count > 0; r++)
+                {
+                    upkeep[r] += count * unitType.Upkeep[r];
+                }
+            }
+        }
+
+        return upkeep;
+    }
+
     /// <summary>
     /// Was eine Nation pro Takt einnimmt: Steuern und Provinzproduktion aus dem aktuellen Besitz, dazu der Saldo der Fabriken
-    /// (Produkte minus verbrauchte Zutaten) auf Basis der Durchläufe im letzten Fabrikzyklus, umgerechnet auf einen Takt.
+    /// (Produkte minus verbrauchte Zutaten) auf Basis der Durchläufe im letzten Fabrikzyklus, umgerechnet auf einen Takt,
+    /// abzüglich des Unterhalts der Armeen.
     /// </summary>
     public static NationIncome IncomePerInterval(GameState state, GameData data, NationId nation)
     {
@@ -77,6 +102,12 @@ public static class EconomyRules
             {
                 resources[i] -= runs * recipe.Inputs[i] / cycle;
             }
+        }
+
+        var upkeep = UpkeepPerInterval(state, data, nation);
+        for (int r = 0; r < resources.Length; r++)
+        {
+            resources[r] -= upkeep[r];
         }
 
         return new NationIncome(money, resources);

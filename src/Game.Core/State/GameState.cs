@@ -101,9 +101,10 @@ public sealed class GameState
     internal void RemoveArmy(ArmyId id) => _armies.RemoveAll(army => army.Id == id);
 
     /// <summary>Legt eine neue Armee mit der nächsten freien ID an.</summary>
-    internal ArmyState CreateArmy(NationId owner, Map.PathPosition position, IReadOnlyList<int> units)
+    internal ArmyState CreateArmy(NationId owner, Map.PathPosition position, IReadOnlyList<int> units, IReadOnlyList<int>? strength = null)
     {
-        var army = new ArmyState(new ArmyId(NextArmyId++), owner, position, units, []);
+        strength ??= Enumerable.Repeat(ArmyState.FullStrength, units.Count).ToArray();
+        var army = new ArmyState(new ArmyId(NextArmyId++), owner, position, units, strength, []);
         _armies.Add(army);
         return army;
     }

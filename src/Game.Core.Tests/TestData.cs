@@ -11,7 +11,9 @@ namespace Game.Core.Tests;
 /// Testkarte: drei Provinzen in einer Reihe, a | b | c, je 10×10 Einheiten, Städte in der Mitte
 /// (5,5), (15,5), (25,5) – benachbarte Städte sind also 10 Einheiten = 10 000 Tausendstel entfernt.
 /// a gehört "red", b und c gehören "blue". Start-Armeen: 2 Infanterie in a (Rot), 1 Kavallerie in c (Blau).
-/// Einheiten: Infanterie 1 Einheit/Tick, Kavallerie 2,5, Artillerie 0,5 mit Reichweite 8. a und c produzieren Holz (1,5/Takt), b Fisch (0,25/Takt).
+/// Einheiten: Infanterie 1 Einheit/Tick (automatisch 1 pro Tag), Kavallerie 2,5 (Auftrag: 5 Ticks, 10 Geld + 1 Schiene,
+/// braucht Kaserne), Artillerie 0,5 mit Reichweite 8 (Auftrag: 3 Ticks, 5 Geld). Kein Unterhalt in den Standard-Testdaten.
+/// Ein Tag dauert 50 Ticks. Kaserne (Gebäude-ID 3): +1 automatische Infanterie pro Tag. a und c produzieren Holz (1,5/Takt), b Fisch (0,25/Takt).
 /// Wirtschaftstakt: 4 Ticks, Steuern 2,50 pro Provinz und Takt.
 /// Gebäude "mine": +10 % je Stufe, 2 Stufen. Stufe 1: 10 Geld, 2 Holz, 3 Ticks. Stufe 2: 20 Geld, 4 Holz, 0,5 Fisch, 5 Ticks.
 /// Fabrik "railworks": 2 Holz + 0,5 Fisch → 1 Schiene, 2 Stufen. Fabrik "carpentry": 3 Holz → 1 Schiene, 1 Stufe.
@@ -27,7 +29,8 @@ internal static class TestData
             { "id": "normal", "name": "Normal", "ticksPerSecond": 10 },
             { "id": "fast", "name": "Schnell", "ticksPerSecond": 20 }
           ],
-          "defaultSpeedLevel": "normal"
+          "defaultSpeedLevel": "normal",
+          "ticksPerDay": 50
         }
         """);
 
@@ -106,6 +109,12 @@ internal static class TestData
               "levels": [
                 { "money": 30, "buildTicks": 2 }
               ]
+            },
+            {
+              "id": "barracks", "name": "Kaserne", "dailyUnitsBonus": 1,
+              "levels": [
+                { "money": 20, "buildTicks": 2 }
+              ]
             }
           ]
         }
@@ -114,9 +123,11 @@ internal static class TestData
     public static JsonObject Units() => Parse("""
         {
           "units": [
-            { "id": "infantry", "name": "Infanterie", "speed": 1 },
-            { "id": "cavalry", "name": "Kavallerie", "speed": 2.5 },
-            { "id": "artillery", "name": "Artillerie", "speed": 0.5, "range": 8 }
+            { "id": "infantry", "name": "Infanterie", "speed": 1, "dailyPerProvince": 1 },
+            { "id": "cavalry", "name": "Kavallerie", "speed": 2.5, "trainingTicks": 5, "requires": "barracks",
+              "cost": { "money": 10, "resources": { "rails": 1 } } },
+            { "id": "artillery", "name": "Artillerie", "speed": 0.5, "range": 8, "trainingTicks": 3,
+              "cost": { "money": 5 } }
           ]
         }
         """);

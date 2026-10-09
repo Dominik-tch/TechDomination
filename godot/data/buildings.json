@@ -21,6 +21,23 @@
       ]
     },
     {
+      "id": "barracks",
+      "name": "Kaserne",
+      // Verdoppelt die automatische Infanterie (+1 pro Tag) und ermöglicht Kavallerie und Artillerie (siehe units.json).
+      "dailyUnitsBonus": 1,
+      "levels": [
+        { "money": 1500, "resources": { "wood": 150, "steel": 50 }, "buildTicks": 3000 }
+      ]
+    },
+    {
+      "id": "vehicleHangar",
+      "name": "Fahrzeughangar",
+      // Ermöglicht Motorisierte Infanterie (siehe units.json).
+      "levels": [
+        { "money": 2000, "resources": { "wood": 200, "steel": 100 }, "buildTicks": 600 }
+      ]
+    },
+    {
       "id": "refinery",
       "name": "Raffinerie",
       "recipe": { "inputs": { "oil": 2 }, "output": "fuel", "amount": 1 },

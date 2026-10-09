@@ -11,6 +11,10 @@
 
   // Fabriken machen nur alle so viele Wirtschaftstakte einen Durchlauf je Stufe (Rezepte siehe buildings.json).
   "factoryCycleIntervals": 4,
+
+  // Stärkeverlust der Einheiten pro Takt, wenn ihr Unterhalt (siehe units.json) vollständig fehlt; bei Teilmangel anteilig.
+  // 0,1 % pro Takt: Eine unversorgte Einheit löst sich nach etwa 17 Minuten bei "normal" auf.
+  "shortageStrengthLossPercent": 0.1,
   "startResources": {
     "wood": 400,
     "steel": 400,
@@ -18,6 +22,8 @@
     "fish": 400,
     "gas": 400,
     "coal": 400,
-    "oil": 400
+    "oil": 400,
+    // Damit die Start-Armeen versorgt sind, bis eine Konservenfabrik läuft.
+    "cannedFood": 200
   }
 }

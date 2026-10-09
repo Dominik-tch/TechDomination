@@ -52,6 +52,25 @@ public class GameDataLoaderTests
     }
 
     [Fact]
+    public void Load_ReadsDayLength()
+    {
+        Assert.Equal(50, TestData.Load().TicksPerDay);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData(0)]
+    public void Load_InvalidDayLength_Throws(int? ticksPerDay)
+    {
+        var simulation = TestData.Simulation();
+        simulation["ticksPerDay"] = ticksPerDay;
+
+        var error = Assert.Throws<GameDataException>(() => GameDataLoader.Load(TestData.Files(simulation: simulation)));
+
+        Assert.Contains("'ticksPerDay'", error.Message);
+    }
+
+    [Fact]
     public void Load_AllowsCommentsAndTrailingCommas()
     {
         var files = TestData.Files();
@@ -62,6 +81,7 @@ public class GameDataLoaderTests
                 { "id": "normal", "name": "Normal", "ticksPerSecond": 12, },
               ],
               "defaultSpeedLevel": "normal",
+              "ticksPerDay": 50,
             }
             """;
 

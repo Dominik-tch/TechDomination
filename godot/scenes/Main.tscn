@@ -16,6 +16,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/ArmyPanel.tscn" id="14_army_panel"]
 [ext_resource type="PackedScene" path="res://scenes/ui/ArmyCommandBar.tscn" id="15_command_bar"]
 [ext_resource type="PackedScene" path="res://scenes/ui/SplitDialog.tscn" id="16_split_dialog"]
+[ext_resource type="PackedScene" path="res://scenes/ui/TrainingSection.tscn" id="17_training"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -73,6 +74,9 @@ layout_mode = 2
 text = "Gebäude:"
 
 [node name="BuildingsSection" parent="Hud/ProvinceInfoPanel/Content" instance=ExtResource("9_buildings")]
+layout_mode = 2
+
+[node name="TrainingSection" parent="Hud/ProvinceInfoPanel/Content" instance=ExtResource("17_training")]
 layout_mode = 2
 
 [node name="TimeControls" parent="Hud" instance=ExtResource("6_time")]

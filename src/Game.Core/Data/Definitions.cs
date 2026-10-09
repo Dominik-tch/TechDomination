@@ -50,13 +50,15 @@ public sealed record BuildingLevelDefinition(long Money, IReadOnlyList<long> Res
 /// Erhöhung des Rohstoff-Outputs der Provinz je Stufe in Basispunkten des Basiswerts (1000 = 10 %).
 /// </param>
 /// <param name="Recipe">Rezept, wenn das Gebäude eine Fabrik ist; jede Stufe zählt wie eine eigene Fabrik.</param>
+/// <param name="DailyUnitsBonus">Zusätzliche automatische Einheiten (Infanterie) pro Tag in einer Provinz mit diesem Gebäude.</param>
 public sealed record BuildingDefinition(
     BuildingId Id,
     string Key,
     string Name,
     IReadOnlyList<BuildingLevelDefinition> Levels,
     long ProductionBonusPerLevel,
-    RecipeDefinition? Recipe)
+    RecipeDefinition? Recipe,
+    int DailyUnitsBonus = 0)
 {
     public int MaxLevel => Levels.Count;
 
@@ -72,8 +74,14 @@ public sealed record BuildingDefinition(
 /// <param name="StartMoney">Startgeld jeder Nation, in Cent.</param>
 /// <param name="StartResources">Startbestand jeder Nation je Ressource in Tausendstel, Index = <see cref="ResourceId.Value"/>.</param>
 /// <param name="FactoryCycleIntervals">Fabriken machen nur alle so viele Wirtschaftstakte einen Durchlauf je Stufe.</param>
+/// <param name="ShortageStrengthLoss">Stärkeverlust pro Wirtschaftstakt bei vollständig fehlendem Unterhalt, in Basispunkten (10 = 0,1 %).</param>
 public sealed record EconomyDefinition(
-    int IntervalTicks, long TaxPerProvince, long StartMoney, IReadOnlyList<long> StartResources, int FactoryCycleIntervals);
+    int IntervalTicks,
+    long TaxPerProvince,
+    long StartMoney,
+    IReadOnlyList<long> StartResources,
+    int FactoryCycleIntervals,
+    long ShortageStrengthLoss = 0);
 
 /// <summary>Nation aus nations.json.</summary>
 /// <param name="Key">Lesbare ID aus der Datendatei.</param>
@@ -84,7 +92,27 @@ public sealed record NationDefinition(NationId Id, string Key, string Name, stri
 /// <param name="Key">Lesbare ID aus der Datendatei.</param>
 /// <param name="Speed">Tempo in Tausendstel Karteneinheiten pro Tick (≥ 1).</param>
 /// <param name="Range">Reichweite in Tausendstel Karteneinheiten (0 = keine Fernwirkung). Wirkt ab dem Kampf (M8).</param>
-public sealed record UnitTypeDefinition(UnitTypeId Id, string Key, string Name, long Speed, long Range);
+/// <param name="DailyPerProvince">Wie viele Einheiten jede Provinz zum Tageswechsel automatisch und kostenlos bekommt (0 = keine).</param>
+/// <param name="TrainingTicks">Ausbildungsdauer per Auftrag in Ticks; 0 = kann nicht per Auftrag ausgebildet werden.</param>
+/// <param name="CostMoney">Kosten pro Einheit in Cent.</param>
+/// <param name="CostResources">Kosten pro Einheit in Tausendstel, Index = <see cref="ResourceId.Value"/>.</param>
+/// <param name="RequiredBuilding">Gebäude, das die Provinz für die Ausbildung braucht, oder <c>null</c>.</param>
+/// <param name="Upkeep">Unterhalt pro Einheit und Wirtschaftstakt in Tausendstel, Index = <see cref="ResourceId.Value"/>.</param>
+public sealed record UnitTypeDefinition(
+    UnitTypeId Id,
+    string Key,
+    string Name,
+    long Speed,
+    long Range,
+    int DailyPerProvince,
+    int TrainingTicks,
+    long CostMoney,
+    IReadOnlyList<long> CostResources,
+    BuildingId? RequiredBuilding,
+    IReadOnlyList<long> Upkeep)
+{
+    public bool IsTrainable => TrainingTicks > 0;
+}
 
 /// <summary>Provinz aus map.json: unveränderliche Eigenschaften. Der Besitzer zur Laufzeit steht im Spielzustand.</summary>
 /// <param name="Key">Lesbare ID aus der Datendatei.</param>

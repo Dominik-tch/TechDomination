@@ -23,6 +23,8 @@ public static class CommandTypes
         Register<MoveArmyCommand>("moveArmy");
         Register<HaltArmyCommand>("haltArmy");
         Register<SplitArmyCommand>("splitArmy");
+        Register<TrainUnitsCommand>("trainUnits");
+        Register<CancelTrainingCommand>("cancelTraining");
     }
 
     /// <summary>Name des registrierten Command-Typs.</summary>

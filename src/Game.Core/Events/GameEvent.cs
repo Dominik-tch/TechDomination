@@ -15,5 +15,12 @@ public sealed record BuildingCompleted(long Tick, ProvinceId Province, BuildingI
 /// <param name="Into">Die stehende Armee, die alle Einheiten übernommen hat.</param>
 public sealed record ArmiesMerged(long Tick, ArmyId Absorbed, ArmyId Into) : GameEvent(Tick);
 
+/// <summary>Einheiten sind in einer Stadt erschienen – per Auftrag ausgebildet oder automatisch zum Tageswechsel.</summary>
+public sealed record UnitsTrained(long Tick, ProvinceId Province, UnitTypeId UnitType, int Count, NationId Owner, bool Automatic)
+    : GameEvent(Tick);
+
+/// <summary>Der Unterhalt einer Nation konnte in diesem Wirtschaftstakt nicht vollständig bezahlt werden.</summary>
+public sealed record UpkeepShortage(long Tick, NationId Nation) : GameEvent(Tick);
+
 /// <summary>Ein Command wurde bei der Ausführung abgelehnt.</summary>
 public sealed record CommandRejected(long Tick, CommandEnvelope Envelope, string Reason) : GameEvent(Tick);

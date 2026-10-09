@@ -4,11 +4,33 @@
   // langsamsten Einheit. Auf der Testkarte sind benachbarte Städte etwa 200–250 Einheiten entfernt:
   // Infanterie mit 0,085 braucht dafür im Schnitt ~2800 Ticks, also gut 4,5 Minuten bei "normal" (10 Ticks/s).
   // "range" = Reichweite in Karteneinheiten (wirkt ab dem Kampf in M8).
-  // Kosten, Ausbildung und Unterhalt kommen mit M7b.
+  // "dailyPerProvince" = automatisch und kostenlos pro Provinz zum Tageswechsel (Kaserne: +1, siehe buildings.json).
+  // "trainingTicks" = Ausbildungsdauer per Auftrag (6000 Ticks = 1 Tag, siehe simulation.json).
+  // "cost" = Kosten pro Einheit, sofort bei Auftrag. "requires" = nötiges Gebäude in der Provinz.
+  // "upkeep" = Unterhalt pro Einheit und Wirtschaftstakt (0,005 Konserven = 3 pro Tag).
   "units": [
-    { "id": "infantry", "name": "Infanterie", "speed": 0.085 },
-    { "id": "cavalry", "name": "Kavallerie", "speed": 0.16 },
-    { "id": "artillery", "name": "Artillerie", "speed": 0.06, "range": 150 },
-    { "id": "motorized", "name": "Motorisierte Infanterie", "speed": 0.2 }
+    {
+      "id": "infantry", "name": "Infanterie", "speed": 0.085,
+      "dailyPerProvince": 1,
+      "upkeep": { "cannedFood": 0.005 }
+    },
+    {
+      "id": "cavalry", "name": "Kavallerie", "speed": 0.16,
+      "trainingTicks": 6000, "requires": "barracks",
+      "cost": { "money": 100, "resources": { "saddles": 2, "rifles": 2, "uniforms": 2 } },
+      "upkeep": { "cannedFood": 0.01 }
+    },
+    {
+      "id": "artillery", "name": "Artillerie", "speed": 0.06, "range": 150,
+      "trainingTicks": 6000, "requires": "barracks",
+      "cost": { "money": 150, "resources": { "artillery": 2, "ammunition": 3 } },
+      "upkeep": { "cannedFood": 0.005 }
+    },
+    {
+      "id": "motorized", "name": "Motorisierte Infanterie", "speed": 0.2,
+      "trainingTicks": 6000, "requires": "vehicleHangar",
+      "cost": { "money": 200, "resources": { "trucks": 1, "rifles": 2, "uniforms": 2 } },
+      "upkeep": { "cannedFood": 0.005, "fuel": 0.01 }
+    }
   ]
 }

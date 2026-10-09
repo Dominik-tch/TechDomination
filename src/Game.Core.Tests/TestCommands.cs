@@ -44,6 +44,7 @@ internal static class TestIds
     public static readonly BuildingId Mine = new(0);
     public static readonly BuildingId Railworks = new(1);
     public static readonly BuildingId Carpentry = new(2);
+    public static readonly BuildingId Barracks = new(3);
 
     public static readonly ResourceId Wood = new(0);
     public static readonly ResourceId Fish = new(1);

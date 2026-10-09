@@ -5,6 +5,8 @@ namespace Game.Core.Data;
 
 internal sealed class SimulationFile
 {
+    public int? TicksPerDay { get; set; }
+
     public List<SpeedLevelEntry?>? SpeedLevels { get; set; }
 
     public string? DefaultSpeedLevel { get; set; }
@@ -63,6 +65,8 @@ internal sealed class BuildingEntry
 
     public RecipeEntry? Recipe { get; set; }
 
+    public int? DailyUnitsBonus { get; set; }
+
     public List<BuildingLevelEntry?>? Levels { get; set; }
 }
 
@@ -95,6 +99,8 @@ internal sealed class EconomyFile
     public Dictionary<string, decimal>? StartResources { get; set; }
 
     public int? FactoryCycleIntervals { get; set; }
+
+    public decimal? ShortageStrengthLossPercent { get; set; }
 }
 
 internal sealed class NationsFile
@@ -151,4 +157,21 @@ internal sealed class UnitEntry
     public decimal? Speed { get; set; }
 
     public decimal? Range { get; set; }
+
+    public int? DailyPerProvince { get; set; }
+
+    public int? TrainingTicks { get; set; }
+
+    public CostEntry? Cost { get; set; }
+
+    public string? Requires { get; set; }
+
+    public Dictionary<string, decimal>? Upkeep { get; set; }
+}
+
+internal sealed class CostEntry
+{
+    public decimal? Money { get; set; }
+
+    public Dictionary<string, decimal>? Resources { get; set; }
 }

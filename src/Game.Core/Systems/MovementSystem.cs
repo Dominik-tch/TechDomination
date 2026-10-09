@@ -72,7 +72,7 @@ internal sealed class MovementSystem : ISimulationSystem
             return;
         }
 
-        standing.AddUnits(arrived.Units);
+        standing.AddUnits(arrived.Units, arrived.Strength);
         state.RemoveArmy(arrived.Id);
         events.Add(new ArmiesMerged(state.Tick, arrived.Id, standing.Id));
     }

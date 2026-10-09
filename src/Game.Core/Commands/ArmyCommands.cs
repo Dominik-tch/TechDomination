@@ -92,7 +92,7 @@ public sealed record SplitArmyCommand(ArmyId Army, IReadOnlyList<int> Units, Pat
     {
         var army = state.FindArmy(Army)!;
         army.RemoveUnits(Units);
-        var split = state.CreateArmy(army.Owner, data.Graph.Normalize(army.Position), Units);
+        var split = state.CreateArmy(army.Owner, data.Graph.Normalize(army.Position), Units, army.Strength);
         var route = data.Graph.FindRoute(split.Position, Target)!;
         split.SetRoute(route.Start, route.Legs);
     }

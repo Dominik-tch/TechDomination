@@ -70,7 +70,7 @@ Gebäude können in jeder Provinz gebaut werden und haben Ausbaustufen. Bauen ko
 - **Ausbildung:**
   - Ein **Tag** dauert 10 Minuten Spielzeit bei Standardgeschwindigkeit (Wert in den Daten).
   - **Infanterie** entsteht automatisch und kostenlos zum Tageswechsel in jeder Provinz: 1 Einheit, mit Kaserne 2. Das lässt sich weder auslösen noch verhindern.
-  - **Kavallerie** und **Artillerie** (benötigen eine Kaserne) sowie **Motorisierte Infanterie** (benötigt einen Fahrzeughangar) werden per Auftrag ausgebildet: Die Kosten werden sofort bezahlt, die Ausbildung dauert 1 Tag ab Auftrag. Pro Provinz wird immer nur eine Einheit gleichzeitig ausgebildet; weitere Aufträge warten in einer Schlange.
+  - **Kavallerie** und **Artillerie** (benötigen eine Kaserne) sowie **Motorisierte Infanterie** (benötigt einen Fahrzeughangar) werden per Auftrag ausgebildet: Die Kosten werden sofort bezahlt, die Ausbildung dauert 1 Tag ab Auftrag. Pro Provinz wird immer nur eine Einheit gleichzeitig ausgebildet; weitere Aufträge warten in einer Schlange. Jeder Auftrag in der Schlange kann abgebrochen werden, die Kosten werden dann voll erstattet.
   - **Kaserne:** keine Ausbaustufen; verdoppelt die automatische Infanterie und ermöglicht Kavallerie und Artillerie.
   - **Fahrzeughangar:** keine Ausbaustufen; ermöglicht Motorisierte Infanterie, ohne Wirkung auf die Infanterie.
   - Neue Einheiten erscheinen in der Stadt und werden einer dort stehenden eigenen Armee zugeschlagen.

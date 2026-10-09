@@ -15,8 +15,11 @@ public static class Simulation
         new ProductionSystem(),
         new FactorySystem(),
         new ConstructionSystem(),
+        new TrainingSystem(),
+        new DailyUnitsSystem(),
         new TaxSystem(),
         new MarketSystem(),
+        new UpkeepSystem(),
         new MovementSystem(),
     ];
 

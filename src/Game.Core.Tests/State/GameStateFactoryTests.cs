@@ -40,7 +40,8 @@ public class GameStateFactoryTests
 
         Assert.All(state.Provinces, province =>
         {
-            Assert.Equal([0, 0, 0], province.BuildingLevels);
+            Assert.Equal([0, 0, 0, 0], province.BuildingLevels);
+            Assert.Empty(province.TrainingQueue);
             Assert.Null(province.Construction);
         });
     }
@@ -55,6 +56,7 @@ public class GameStateFactoryTests
         Assert.Equal(TestIds.Red, red.Owner);
         Assert.Equal(Game.Core.Map.PathPosition.AtCity(TestIds.A), red.Position);
         Assert.Equal([2, 0, 0], red.Units);
+        Assert.Equal([10_000, 10_000, 10_000], red.Strength);
         Assert.False(red.IsMoving);
         Assert.Equal(TestIds.Blue, state.FindArmy(TestIds.BlueArmy)!.Owner);
         Assert.Equal(2, state.NextArmyId);
@@ -63,7 +65,7 @@ public class GameStateFactoryTests
     [Fact]
     public void Constructor_RejectsArmyIdsNotBelowNextId()
     {
-        var army = new ArmyState(new ArmyId(3), TestIds.Red, Game.Core.Map.PathPosition.AtCity(TestIds.A), [1, 0, 0], []);
+        var army = new ArmyState(new ArmyId(3), TestIds.Red, Game.Core.Map.PathPosition.AtCity(TestIds.A), [1, 0, 0], [10_000, 10_000, 10_000], []);
 
         Assert.Throws<ArgumentException>(
             () => new GameState(1, 0, Game.Core.Determinism.DeterministicRandom.FromSeed(1), [], [], [army], 3));
@@ -88,8 +90,8 @@ public class GameStateFactoryTests
     {
         var provinces = new List<ProvinceState>
         {
-            new(new ProvinceId(1), new NationId(0), [], null),
-            new(new ProvinceId(0), new NationId(0), [], null),
+            new(new ProvinceId(1), new NationId(0), [], null, [], 0),
+            new(new ProvinceId(0), new NationId(0), [], null, [], 0),
         };
 
         Assert.Throws<ArgumentException>(
@@ -128,8 +130,8 @@ public class GameStateFactoryTests
         Assert.All(state.Nations, nation =>
         {
             Assert.Equal([10_00, 4_00, 50_00], nation.MarketPrices);
-            Assert.Equal([null, null, null], nation.FactoryLimits);
-            Assert.Equal([0, 0, 0], nation.LastFactoryRuns);
+            Assert.Equal([null, null, null, null], nation.FactoryLimits);
+            Assert.Equal([0, 0, 0, 0], nation.LastFactoryRuns);
         });
     }
 

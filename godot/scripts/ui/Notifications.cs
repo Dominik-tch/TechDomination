@@ -3,13 +3,19 @@ using Godot;
 
 namespace TechDomination.UI;
 
-/// <summary>Kurze Meldungen unten links zu eigenen Ereignissen (fertige Bauten, abgelehnte Aktionen).</summary>
+/// <summary>
+/// Kurze Meldungen unten links zu eigenen Ereignissen: fertige Bauten, ausgebildete Einheiten, neuer Tag,
+/// Beginn eines Versorgungsmangels, abgelehnte Aktionen.
+/// </summary>
 public partial class Notifications : VBoxContainer
 {
     private const double DisplaySeconds = 6;
     private const int MaxEntries = 5;
 
     private SimulationDriver _driver = null!;
+
+    // Ein Mangel wird nur einmal gemeldet, solange er ohne Unterbrechung anhält.
+    private long _lastShortageTick = long.MinValue;
 
     public override void _Ready()
     {
@@ -29,12 +35,30 @@ public partial class Notifications : VBoxContainer
             return;
         }
 
+        int dailyUnits = events.OfType<UnitsTrained>().Where(t => t.Automatic && t.Owner == _driver.LocalNation).Sum(t => t.Count);
+        if (dailyUnits > 0)
+        {
+            Add($"Neuer Tag: +{dailyUnits} Infanterie in deinen Provinzen.");
+        }
+
+        foreach (var shortage in events.OfType<UpkeepShortage>().Where(s => s.Nation == _driver.LocalNation))
+        {
+            if (shortage.Tick - _lastShortageTick > data.Economy.IntervalTicks)
+            {
+                Add("Versorgung fehlt – Armeen verlieren Stärke.");
+            }
+
+            _lastShortageTick = shortage.Tick;
+        }
+
         foreach (var gameEvent in events)
         {
             string? message = gameEvent switch
             {
                 BuildingCompleted completed when completed.Owner == _driver.LocalNation =>
                     $"{data.GetBuilding(completed.Building).Name} Stufe {completed.Level} in {data.GetProvince(completed.Province).Name} fertig.",
+                UnitsTrained { Automatic: false } trained when trained.Owner == _driver.LocalNation =>
+                    $"{data.GetUnitType(trained.UnitType).Name} in {data.GetProvince(trained.Province).Name} ausgebildet.",
                 CommandRejected rejected when rejected.Envelope.Issuer == _driver.LocalNation =>
                     $"Aktion abgelehnt: {rejected.Reason}",
                 _ => null,

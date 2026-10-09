@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/TrainingSection.cs" id="1_training"]
+
+[node name="TrainingSection" type="VBoxContainer"]
+custom_minimum_size = Vector2(300, 0)
+script = ExtResource("1_training")
