@@ -115,7 +115,10 @@ public static class SaveGameSerializer
         var state = save.State;
         bool matches = state.Provinces.Count == data.Provinces.Count
             && state.Nations.Count == data.Nations.Count
-            && state.Nations.All(n => n.Resources.Count == data.Resources.Count)
+            && state.Nations.All(n => n.Resources.Count == data.Resources.Count
+                && n.MarketPrices.Count == data.Resources.Count
+                && n.FactoryLimits.Count == data.Buildings.Count
+                && n.LastFactoryRuns.Count == data.Buildings.Count)
             && state.Provinces.All(p => data.Contains(p.Owner)
                 && p.BuildingLevels.Count == data.Buildings.Count
                 && p.BuildingLevels.Select((level, i) => level >= 0 && level <= data.Buildings[i].MaxLevel).All(ok => ok)

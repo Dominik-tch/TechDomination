@@ -11,6 +11,7 @@ public class EconomyLoadingTests
         var economy = TestData.Load().Economy;
 
         Assert.Equal(4, economy.IntervalTicks);
+        Assert.Equal(1, economy.FactoryCycleIntervals);
         Assert.Equal(250, economy.TaxPerProvince);
         Assert.Equal(100_00, economy.StartMoney);
         Assert.Equal([10_000, 500, 0], economy.StartResources);
@@ -31,6 +32,7 @@ public class EconomyLoadingTests
     [InlineData("intervalTicks")]
     [InlineData("taxPerProvince")]
     [InlineData("startMoney")]
+    [InlineData("factoryCycleIntervals")]
     public void MissingField_Throws(string field)
     {
         var economy = TestData.Economy();
@@ -52,6 +54,17 @@ public class EconomyLoadingTests
         var error = LoadFails(economy);
 
         Assert.Contains("'intervalTicks'", error.Message);
+    }
+
+    [Fact]
+    public void FactoryCycleBelowOne_Throws()
+    {
+        var economy = TestData.Economy();
+        economy["factoryCycleIntervals"] = 0;
+
+        var error = LoadFails(economy);
+
+        Assert.Contains("'factoryCycleIntervals'", error.Message);
     }
 
     [Fact]

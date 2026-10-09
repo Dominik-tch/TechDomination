@@ -43,6 +43,23 @@ public class RealDataTests
     }
 
     [Fact]
+    public void EveryAdvancedResource_IsProducedByAFactory()
+    {
+        foreach (var resource in _data.Resources.Where(r => r.Tier == ResourceTier.Advanced))
+        {
+            Assert.True(
+                _data.Buildings.Any(b => b.Recipe?.Output == resource.Id),
+                $"Kein Rezept erzeugt '{resource.Key}'.");
+        }
+    }
+
+    [Fact]
+    public void Factories_HaveFiveLevels()
+    {
+        Assert.All(_data.Buildings.Where(b => b.IsFactory), factory => Assert.Equal(5, factory.MaxLevel));
+    }
+
+    [Fact]
     public void EveryBasicResource_HasMapIcon()
     {
         // Godot lädt res://assets/icons/resources/<id>.svg; ohne Symbol fehlt der Rohstoff auf der Karte.

@@ -2,6 +2,10 @@
   // Gebäude. Alle Kosten und Bauzeiten sind Platzhalter fürs Balancing.
   // Jede Stufe in "levels" hat eigene Kosten (bei Baustart bezahlt) und eine Bauzeit in Ticks
   // (10 Ticks = 1 Sekunde bei "normal"). Die Anzahl der Einträge ist die Maximalstufe.
+  // Fabriken haben ein "recipe": pro Stufe ein Durchlauf je Fabrikzyklus, wenn alle Zutaten im Pool sind.
+  // Rezeptmengen gelten pro Durchlauf. Wie oft eine Fabrik läuft, steht in economy.json ("factoryCycleIntervals").
+  // Förderanlage: Stufe n kostet n × (1000 Geld, 100 Holz, 30 Stahl).
+  // Fabrik-Stufen: Stufe 1 = Grundpreis (doppelter Grundpreis der Förderanlage), Stufen 2–5 je 50 % teurer.
   "buildings": [
     {
       "id": "extraction",
@@ -9,11 +13,215 @@
       // Erhöht den Rohstoff-Output der Provinz je Stufe um diesen Anteil des Basiswerts (Stufe 5 = +50 %).
       "productionBonusPercent": 10,
       "levels": [
-        { "money": 100, "resources": { "wood": 10, "steel": 5 }, "buildTicks": 300 },
-        { "money": 200, "resources": { "wood": 20, "steel": 10 }, "buildTicks": 600 },
-        { "money": 300, "resources": { "wood": 30, "steel": 15 }, "buildTicks": 900 },
-        { "money": 400, "resources": { "wood": 40, "steel": 20 }, "buildTicks": 1200 },
-        { "money": 500, "resources": { "wood": 50, "steel": 25 }, "buildTicks": 1500 }
+        { "money": 1000, "resources": { "wood": 100, "steel": 30 }, "buildTicks": 300 },
+        { "money": 2000, "resources": { "wood": 200, "steel": 60 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 900 },
+        { "money": 4000, "resources": { "wood": 400, "steel": 120 }, "buildTicks": 1200 },
+        { "money": 5000, "resources": { "wood": 500, "steel": 150 }, "buildTicks": 1500 }
+      ]
+    },
+    {
+      "id": "refinery",
+      "name": "Raffinerie",
+      "recipe": { "inputs": { "oil": 2 }, "output": "fuel", "amount": 1 },
+      "levels": [
+        { "money": 2000, "resources": { "wood": 200, "steel": 60 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 }
+      ]
+    },
+    {
+      "id": "chemicalPlant",
+      "name": "Chemiewerk",
+      "recipe": { "inputs": { "gas": 1, "coal": 1 }, "output": "chemicals", "amount": 1 },
+      "levels": [
+        { "money": 2000, "resources": { "wood": 200, "steel": 60 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 }
+      ]
+    },
+    {
+      "id": "weavingMill",
+      "name": "Weberei",
+      "recipe": { "inputs": { "grain": 2 }, "output": "cloth", "amount": 1 },
+      "levels": [
+        { "money": 2000, "resources": { "wood": 200, "steel": 60 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 }
+      ]
+    },
+    {
+      "id": "tannery",
+      "name": "Gerberei",
+      "recipe": { "inputs": { "grain": 2, "chemicals": 1 }, "output": "leather", "amount": 1 },
+      "levels": [
+        { "money": 2000, "resources": { "wood": 200, "steel": 60 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 }
+      ]
+    },
+    {
+      "id": "cementWorks",
+      "name": "Zementwerk",
+      "recipe": { "inputs": { "coal": 3 }, "output": "concrete", "amount": 1 },
+      "levels": [
+        { "money": 2000, "resources": { "wood": 200, "steel": 60 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 }
+      ]
+    },
+    {
+      "id": "explosivesPlant",
+      "name": "Sprengstofffabrik",
+      "recipe": { "inputs": { "chemicals": 2, "coal": 1 }, "output": "explosives", "amount": 1 },
+      "levels": [
+        { "money": 2000, "resources": { "wood": 200, "steel": 60 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 }
+      ]
+    },
+    {
+      "id": "rollingMill",
+      "name": "Walzwerk",
+      "recipe": { "inputs": { "steel": 2, "wood": 5 }, "output": "rails", "amount": 1 },
+      "levels": [
+        { "money": 2000, "resources": { "wood": 200, "steel": 60 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 }
+      ]
+    },
+    {
+      "id": "armsFactory",
+      "name": "Waffenfabrik",
+      "recipe": { "inputs": { "steel": 2, "wood": 1 }, "output": "rifles", "amount": 1 },
+      "levels": [
+        { "money": 2000, "resources": { "wood": 200, "steel": 60 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 }
+      ]
+    },
+    {
+      "id": "ammunitionPlant",
+      "name": "Munitionsfabrik",
+      "recipe": { "inputs": { "steel": 1, "explosives": 1 }, "output": "ammunition", "amount": 1 },
+      "levels": [
+        { "money": 2000, "resources": { "wood": 200, "steel": 60 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 }
+      ]
+    },
+    {
+      "id": "gunFoundry",
+      "name": "Geschützgießerei",
+      "recipe": { "inputs": { "steel": 5, "wood": 1 }, "output": "artillery", "amount": 1 },
+      "levels": [
+        { "money": 2000, "resources": { "wood": 200, "steel": 60 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 }
+      ]
+    },
+    {
+      "id": "engineWorks",
+      "name": "Motorenwerk",
+      "recipe": { "inputs": { "steel": 3, "fuel": 1 }, "output": "engines", "amount": 1 },
+      "levels": [
+        { "money": 2000, "resources": { "wood": 200, "steel": 60 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 }
+      ]
+    },
+    {
+      "id": "vehicleWorks",
+      "name": "Fahrzeugwerk",
+      "recipe": { "inputs": { "engines": 1, "steel": 2, "wood": 1 }, "output": "trucks", "amount": 1 },
+      "levels": [
+        { "money": 2000, "resources": { "wood": 200, "steel": 60 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 }
+      ]
+    },
+    {
+      "id": "aircraftWorks",
+      "name": "Flugzeugwerk",
+      "recipe": { "inputs": { "wood": 3, "cloth": 1 }, "output": "wings", "amount": 1 },
+      "levels": [
+        { "money": 2000, "resources": { "wood": 200, "steel": 60 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 }
+      ]
+    },
+    {
+      "id": "saddlery",
+      "name": "Sattlerei",
+      "recipe": { "inputs": { "leather": 1, "wood": 1 }, "output": "saddles", "amount": 1 },
+      "levels": [
+        { "money": 2000, "resources": { "wood": 200, "steel": 60 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 }
+      ]
+    },
+    {
+      "id": "tailorShop",
+      "name": "Schneiderei",
+      "recipe": { "inputs": { "cloth": 2 }, "output": "uniforms", "amount": 1 },
+      "levels": [
+        { "money": 2000, "resources": { "wood": 200, "steel": 60 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 }
+      ]
+    },
+    {
+      "id": "cannery",
+      "name": "Konservenfabrik",
+      "recipe": { "inputs": { "fish": 2, "steel": 1 }, "output": "cannedFood", "amount": 1 },
+      "levels": [
+        { "money": 2000, "resources": { "wood": 200, "steel": 60 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 }
+      ]
+    },
+    {
+      "id": "wireMill",
+      "name": "Drahtzieherei",
+      "recipe": { "inputs": { "steel": 2 }, "output": "barbedWire", "amount": 1 },
+      "levels": [
+        { "money": 2000, "resources": { "wood": 200, "steel": 60 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 },
+        { "money": 3000, "resources": { "wood": 300, "steel": 90 }, "buildTicks": 600 }
       ]
     }
   ]

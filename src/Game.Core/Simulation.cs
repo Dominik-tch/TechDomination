@@ -13,8 +13,10 @@ public static class Simulation
     private static readonly ISimulationSystem[] Systems =
     [
         new ProductionSystem(),
+        new FactorySystem(),
         new ConstructionSystem(),
         new TaxSystem(),
+        new MarketSystem(),
     ];
 
     /// <summary>

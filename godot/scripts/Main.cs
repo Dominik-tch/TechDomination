@@ -16,6 +16,7 @@ public partial class Main : Node2D
         _infoPanel = GetNode<ProvinceInfoPanel>("Hud/ProvinceInfoPanel");
 
         _mapView.SelectionChanged += _infoPanel.ShowProvince;
+        GetNode<Button>("Hud/WindowButtons/EconomyButton").Pressed += GetNode<EconomyWindow>("Hud/EconomyWindow").Toggle;
         GetNode<MapCamera>("MapCamera").FitTo(_mapView.Bounds);
     }
 

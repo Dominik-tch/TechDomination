@@ -1,0 +1,73 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/EconomyWindow.cs" id="1_economy"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_window"]
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 12.0
+bg_color = Color(0.13, 0.14, 0.16, 0.97)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="EconomyWindow" type="PanelContainer"]
+visible = false
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -440.0
+offset_top = -236.0
+offset_right = 440.0
+offset_bottom = 310.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_window")
+script = ExtResource("1_economy")
+
+[node name="Content" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Header" type="HBoxContainer" parent="Content"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Content/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Wirtschaft (W)"
+
+[node name="CloseButton" type="Button" parent="Content/Header"]
+layout_mode = 2
+focus_mode = 0
+text = "Schließen"
+
+[node name="Tabs" type="TabContainer" parent="Content"]
+layout_mode = 2
+size_flags_vertical = 3
+current_tab = 0
+
+[node name="Markt" type="ScrollContainer" parent="Content/Tabs"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+metadata/_tab_index = 0
+
+[node name="MarketGrid" type="GridContainer" parent="Content/Tabs/Markt"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 12
+columns = 11
+
+[node name="Fabriken" type="ScrollContainer" parent="Content/Tabs"]
+visible = false
+layout_mode = 2
+horizontal_scroll_mode = 0
+metadata/_tab_index = 1
+
+[node name="FactoryList" type="VBoxContainer" parent="Content/Tabs/Fabriken"]
+layout_mode = 2
+size_flags_horizontal = 3

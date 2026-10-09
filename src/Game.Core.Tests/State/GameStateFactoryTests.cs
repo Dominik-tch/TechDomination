@@ -40,7 +40,7 @@ public class GameStateFactoryTests
 
         Assert.All(state.Provinces, province =>
         {
-            Assert.Equal([0], province.BuildingLevels);
+            Assert.Equal([0, 0, 0], province.BuildingLevels);
             Assert.Null(province.Construction);
         });
     }
@@ -69,7 +69,7 @@ public class GameStateFactoryTests
     [Fact]
     public void Constructor_RejectsUnsortedNations()
     {
-        var nations = new List<NationState> { new(new NationId(1), 0, []), new(new NationId(0), 0, []) };
+        var nations = new List<NationState> { new(new NationId(1), 0, [], [], [], []), new(new NationId(0), 0, [], [], [], []) };
 
         Assert.Throws<ArgumentException>(
             () => new GameState(1, 0, Game.Core.Determinism.DeterministicRandom.FromSeed(1), nations, []));
@@ -87,6 +87,19 @@ public class GameStateFactoryTests
         {
             Assert.Equal(100_00, nation.Money);
             Assert.Equal([10_000, 500, 0], nation.Resources);
+        });
+    }
+
+    [Fact]
+    public void CreateNew_MarketStartsAtBasePricesAndFactoriesUnlimited()
+    {
+        var state = GameStateFactory.CreateNew(TestData.Load(), seed: 1);
+
+        Assert.All(state.Nations, nation =>
+        {
+            Assert.Equal([10_00, 4_00, 50_00], nation.MarketPrices);
+            Assert.Equal([null, null, null], nation.FactoryLimits);
+            Assert.Equal([0, 0, 0], nation.LastFactoryRuns);
         });
     }
 

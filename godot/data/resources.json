@@ -1,15 +1,32 @@
 {
-  // Basis-Rohstoffe: jede Provinz produziert genau einen davon.
-  // "production" = Menge pro Provinz und Wirtschaftstakt (siehe economy.json), unabhängig von der Provinzgröße.
-  // Fortgeschrittene Güter ("tier": "advanced") kommen mit Meilenstein M6 dazu und haben kein "production".
-  // Werte sind Platzhalter fürs Balancing.
+  // Ressourcen. Alle Werte sind Platzhalter fürs Balancing.
+  // "production" (nur Basis-Rohstoffe) = Menge pro Provinz und Wirtschaftstakt, unabhängig von der Provinzgröße.
+  // "basePrice" = Basispreis pro Einheit auf dem Markt. Fortgeschrittene Güter: etwa Summe der Zutaten × 1,3.
+  // Fortgeschrittene Güter entstehen nur in Fabriken (Rezepte in buildings.json).
   "resources": [
-    { "id": "wood", "name": "Holz", "tier": "basic", "production": 1 },
-    { "id": "steel", "name": "Stahl", "tier": "basic", "production": 1 },
-    { "id": "grain", "name": "Getreide", "tier": "basic", "production": 1 },
-    { "id": "fish", "name": "Fisch", "tier": "basic", "production": 1 },
-    { "id": "gas", "name": "Gas", "tier": "basic", "production": 1 },
-    { "id": "coal", "name": "Kohle", "tier": "basic", "production": 1 },
-    { "id": "oil", "name": "Öl", "tier": "basic", "production": 1 }
+    { "id": "wood", "name": "Holz", "tier": "basic", "production": 1, "basePrice": 10 },
+    { "id": "steel", "name": "Stahl", "tier": "basic", "production": 1, "basePrice": 10 },
+    { "id": "grain", "name": "Getreide", "tier": "basic", "production": 1, "basePrice": 10 },
+    { "id": "fish", "name": "Fisch", "tier": "basic", "production": 1, "basePrice": 10 },
+    { "id": "gas", "name": "Gas", "tier": "basic", "production": 1, "basePrice": 10 },
+    { "id": "coal", "name": "Kohle", "tier": "basic", "production": 1, "basePrice": 10 },
+    { "id": "oil", "name": "Öl", "tier": "basic", "production": 1, "basePrice": 10 },
+    { "id": "fuel", "name": "Treibstoff", "tier": "advanced", "basePrice": 26 },
+    { "id": "chemicals", "name": "Chemikalien", "tier": "advanced", "basePrice": 26 },
+    { "id": "cloth", "name": "Stoff", "tier": "advanced", "basePrice": 26 },
+    { "id": "leather", "name": "Leder", "tier": "advanced", "basePrice": 60 },
+    { "id": "concrete", "name": "Beton", "tier": "advanced", "basePrice": 40 },
+    { "id": "explosives", "name": "Sprengstoff", "tier": "advanced", "basePrice": 80 },
+    { "id": "rails", "name": "Schienen", "tier": "advanced", "basePrice": 90 },
+    { "id": "rifles", "name": "Gewehre", "tier": "advanced", "basePrice": 40 },
+    { "id": "ammunition", "name": "Munition", "tier": "advanced", "basePrice": 115 },
+    { "id": "artillery", "name": "Geschütze", "tier": "advanced", "basePrice": 80 },
+    { "id": "engines", "name": "Motoren", "tier": "advanced", "basePrice": 75 },
+    { "id": "trucks", "name": "Lastwagen", "tier": "advanced", "basePrice": 135 },
+    { "id": "wings", "name": "Flügel", "tier": "advanced", "basePrice": 75 },
+    { "id": "saddles", "name": "Sättel", "tier": "advanced", "basePrice": 90 },
+    { "id": "uniforms", "name": "Uniformen", "tier": "advanced", "basePrice": 70 },
+    { "id": "cannedFood", "name": "Konserven", "tier": "advanced", "basePrice": 40 },
+    { "id": "barbedWire", "name": "Stacheldraht", "tier": "advanced", "basePrice": 26 }
   ]
 }

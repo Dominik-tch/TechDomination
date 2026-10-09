@@ -1,0 +1,12 @@
+[gd_scene format=3]
+
+[node name="WindowButtons" type="HBoxContainer"]
+offset_left = 120.0
+offset_top = 10.0
+offset_right = 420.0
+offset_bottom = 41.0
+
+[node name="EconomyButton" type="Button" parent="."]
+layout_mode = 2
+focus_mode = 0
+text = "Wirtschaft (W)"

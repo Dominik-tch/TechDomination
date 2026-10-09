@@ -10,6 +10,8 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/PauseMenu.tscn" id="8_menu"]
 [ext_resource type="PackedScene" path="res://scenes/ui/BuildingsSection.tscn" id="9_buildings"]
 [ext_resource type="PackedScene" path="res://scenes/ui/Notifications.tscn" id="10_notifications"]
+[ext_resource type="PackedScene" path="res://scenes/ui/EconomyWindow.tscn" id="11_economy"]
+[ext_resource type="PackedScene" path="res://scenes/ui/WindowButtons.tscn" id="12_buttons"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -71,5 +73,9 @@ layout_mode = 2
 [node name="ResourceBar" parent="Hud" instance=ExtResource("7_bar")]
 
 [node name="Notifications" parent="Hud" instance=ExtResource("10_notifications")]
+
+[node name="WindowButtons" parent="Hud" instance=ExtResource("12_buttons")]
+
+[node name="EconomyWindow" parent="Hud" instance=ExtResource("11_economy")]
 
 [node name="PauseMenu" parent="Hud" instance=ExtResource("8_menu")]

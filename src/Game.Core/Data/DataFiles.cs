@@ -33,6 +33,19 @@ internal sealed class ResourceEntry
     public string? Tier { get; set; }
 
     public decimal? Production { get; set; }
+
+    public decimal? BasePrice { get; set; }
+}
+
+internal sealed class MarketFile
+{
+    public decimal? PriceChangePercentPerUnit { get; set; }
+
+    public decimal? RecoveryPercentPerInterval { get; set; }
+
+    public decimal? MinPricePercent { get; set; }
+
+    public decimal? SellPricePercent { get; set; }
 }
 
 internal sealed class BuildingsFile
@@ -48,7 +61,18 @@ internal sealed class BuildingEntry
 
     public decimal? ProductionBonusPercent { get; set; }
 
+    public RecipeEntry? Recipe { get; set; }
+
     public List<BuildingLevelEntry?>? Levels { get; set; }
+}
+
+internal sealed class RecipeEntry
+{
+    public Dictionary<string, decimal>? Inputs { get; set; }
+
+    public string? Output { get; set; }
+
+    public decimal? Amount { get; set; }
 }
 
 internal sealed class BuildingLevelEntry
@@ -69,6 +93,8 @@ internal sealed class EconomyFile
     public decimal? StartMoney { get; set; }
 
     public Dictionary<string, decimal>? StartResources { get; set; }
+
+    public int? FactoryCycleIntervals { get; set; }
 }
 
 internal sealed class NationsFile

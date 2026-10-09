@@ -40,7 +40,9 @@ Die Simulation läuft in Ticks. Es gibt mehrere Geschwindigkeitsstufen.
 - **Produktion:** feste Menge je Rohstoff, unabhängig von der Provinzgröße. Bestimmte Gebäude können später den Rohstoff-Output erhöhen.
 - **Geld** kommt aus Steuern pro Provinz und aus dem Verkauf von Ressourcen. Steuern sind ein fester Betrag pro Provinz, unabhängig von der Provinzgröße; Gebäude erhöhen die Steuern nicht.
 - **Start:** Jede Nation beginnt mit einem festen Startbetrag an Geld und an Rohstoffen (Werte in den Daten).
-- **Markt:** Jeder Spieler hat einen eigenen Markt, der nur von seinen eigenen Käufen und Verkäufen abhängt. Kaufen erhöht den Preis der Ressource, der Preis sinkt danach langsam zum Basispreis zurück.
+- **Markt:** Jeder Spieler hat einen eigenen Markt, der nur von seinen eigenen Käufen und Verkäufen abhängt. Kaufen erhöht den Preis der Ressource, Verkaufen senkt ihn; danach bewegt sich der Preis langsam zum Basispreis zurück. Verkaufen bringt 80 % des aktuellen Preises.
+- **Fabriken** sind Gebäude mit einem festen Rezept und bis zu 5 Stufen. Jede Stufe zählt wie eine eigene Fabrik (ein Rezept-Durchlauf je Fabrikzyklus). Rezepte werden in ganzen Mengen angezeigt (z. B. 2 Öl → 1 Treibstoff); wie oft eine Fabrik läuft, steht in den Daten. Ausbaustufen kosten je 50 % mehr als der Bau der Fabrik.
+- **Fabrik-Steuerung:** Eine Verwaltungsansicht zeigt alle Fabriktypen mit je einem Schieberegler, der festlegt, wie viele Fabriken dieses Typs laufen (so viele Schritte, wie es Fabriken bzw. Stufen gibt; z. B. bei 2 Fabriken: 0, 1 oder 2). Neue Fabriken laufen automatisch mit, solange der Regler nicht heruntergezogen wurde.
 - Konkrete Ressourcen, Rezepte und Preise stehen in separaten Daten-/Konfigurationsdateien, nicht in diesem Dokument.
 
 **Fertig, wenn:** Provinzen produzieren laufend, Fabriken verarbeiten nach Rezept, Kaufen/Verkaufen funktioniert inkl. Preisanstieg und Preiserholung.
@@ -59,6 +61,7 @@ Gebäude können in jeder Provinz gebaut werden und haben Ausbaustufen. Bauen ko
 - Armeen sind **gemischte Stacks** aus mehreren Einheitentypen.
 - Bewegung entlang benachbarter Provinzen, Dauer abhängig von Provinzgröße und Einheitentyp.
 - **Kampf** läuft automatisch über Zeit, in Runden alle X Ticks, sobald feindliche Armeen in derselben Provinz sind.
+- **Laufender Verbrauch:** Armeen verbrauchen Konserven als Unterhalt, solange sie existieren; motorisierte Einheiten verbrauchen Treibstoff; Munition wird im Kampf verbraucht. Kriege kosten dadurch laufend Wirtschaftsleistung. Mengen und Takt werden mit M7/M8 festgelegt.
 - Provinzen werden durch Einmarsch erobert.
 
 **Fertig, wenn:** Armeen können aufgestellt, zusammengelegt/geteilt, bewegt werden, Kämpfe werden ausgetragen, Provinzen wechseln den Besitzer.
@@ -122,7 +125,6 @@ Diese Punkte werden bewusst **nicht** gebaut, solange sie nicht hier ergänzt we
 
 ## Annahmen (zu bestätigen)
 
-- Verkaufen senkt den Marktpreis, analog zum Kaufen.
 - Einheiten kosten Ressourcen aus der Produktionskette (z. B. Kavallerie braucht Sättel).
 - Die 60 % beim Sofortsieg beziehen sich auf die Anzahl der Provinzen.
 

@@ -17,6 +17,9 @@ public static class CommandTypes
     {
         Register<BuildBuildingCommand>("buildBuilding");
         Register<CancelConstructionCommand>("cancelConstruction");
+        Register<BuyResourceCommand>("buyResource");
+        Register<SellResourceCommand>("sellResource");
+        Register<SetFactoryActivityCommand>("setFactoryActivity");
     }
 
     /// <summary>Name des registrierten Command-Typs.</summary>

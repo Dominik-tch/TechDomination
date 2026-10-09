@@ -1,0 +1,11 @@
+{
+  // Nationaler Markt. Alle Werte sind Platzhalter fürs Balancing.
+  // Jede gekaufte Einheit erhöht den Preis um diesen Anteil des Basispreises, jede verkaufte senkt ihn.
+  "priceChangePercentPerUnit": 0.5,
+  // Pro Wirtschaftstakt bewegt sich der Preis um diesen Anteil des Abstands zurück zum Basispreis (mindestens 1 Cent).
+  "recoveryPercentPerInterval": 1.25,
+  // Der Preis fällt nie unter diesen Anteil des Basispreises.
+  "minPricePercent": 20,
+  // Verkaufen bringt diesen Anteil des aktuellen Preises.
+  "sellPricePercent": 80
+}

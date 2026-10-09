@@ -12,6 +12,9 @@ namespace Game.Core.Tests;
 /// a gehört "red", b und c gehören "blue". a und c produzieren Holz (1,5/Takt), b Fisch (0,25/Takt).
 /// Wirtschaftstakt: 4 Ticks, Steuern 2,50 pro Provinz und Takt.
 /// Gebäude "mine": +10 % je Stufe, 2 Stufen. Stufe 1: 10 Geld, 2 Holz, 3 Ticks. Stufe 2: 20 Geld, 4 Holz, 0,5 Fisch, 5 Ticks.
+/// Fabrik "railworks": 2 Holz + 0,5 Fisch → 1 Schiene, 2 Stufen. Fabrik "carpentry": 3 Holz → 1 Schiene, 1 Stufe.
+/// Basispreise: Holz 10, Fisch 4, Schienen 50. Markt: ±10 % des Basispreises je Einheit, Erholung 50 % je Takt,
+/// Untergrenze 20 %, Verkauf zu 80 %.
 /// </remarks>
 internal static class TestData
 {
@@ -29,9 +32,9 @@ internal static class TestData
     public static JsonObject Resources() => Parse("""
         {
           "resources": [
-            { "id": "wood", "name": "Holz", "tier": "basic", "production": 1.5 },
-            { "id": "fish", "name": "Fisch", "tier": "basic", "production": 0.25 },
-            { "id": "rails", "name": "Schienen", "tier": "advanced" }
+            { "id": "wood", "name": "Holz", "tier": "basic", "production": 1.5, "basePrice": 10 },
+            { "id": "fish", "name": "Fisch", "tier": "basic", "production": 0.25, "basePrice": 4 },
+            { "id": "rails", "name": "Schienen", "tier": "advanced", "basePrice": 50 }
           ]
         }
         """);
@@ -69,7 +72,8 @@ internal static class TestData
           "intervalTicks": 4,
           "taxPerProvince": 2.5,
           "startMoney": 100,
-          "startResources": { "wood": 10, "fish": 0.5 }
+          "startResources": { "wood": 10, "fish": 0.5 },
+          "factoryCycleIntervals": 1
         }
         """);
 
@@ -82,8 +86,32 @@ internal static class TestData
                 { "money": 10, "resources": { "wood": 2 }, "buildTicks": 3 },
                 { "money": 20, "resources": { "wood": 4, "fish": 0.5 }, "buildTicks": 5 }
               ]
+            },
+            {
+              "id": "railworks", "name": "Walzwerk",
+              "recipe": { "inputs": { "wood": 2, "fish": 0.5 }, "output": "rails", "amount": 1 },
+              "levels": [
+                { "money": 30, "buildTicks": 2 },
+                { "money": 45, "buildTicks": 2 }
+              ]
+            },
+            {
+              "id": "carpentry", "name": "Schreinerei",
+              "recipe": { "inputs": { "wood": 3 }, "output": "rails", "amount": 1 },
+              "levels": [
+                { "money": 30, "buildTicks": 2 }
+              ]
             }
           ]
+        }
+        """);
+
+    public static JsonObject Market() => Parse("""
+        {
+          "priceChangePercentPerUnit": 10,
+          "recoveryPercentPerInterval": 50,
+          "minPricePercent": 20,
+          "sellPricePercent": 80
         }
         """);
 
@@ -94,7 +122,8 @@ internal static class TestData
         JsonObject? nations = null,
         JsonObject? map = null,
         JsonObject? economy = null,
-        JsonObject? buildings = null) => new(StringComparer.Ordinal)
+        JsonObject? buildings = null,
+        JsonObject? market = null) => new(StringComparer.Ordinal)
     {
         [GameDataLoader.SimulationFileName] = (simulation ?? Simulation()).ToJsonString(),
         [GameDataLoader.ResourcesFileName] = (resources ?? Resources()).ToJsonString(),
@@ -102,6 +131,7 @@ internal static class TestData
         [GameDataLoader.MapFileName] = (map ?? Map()).ToJsonString(),
         [GameDataLoader.EconomyFileName] = (economy ?? Economy()).ToJsonString(),
         [GameDataLoader.BuildingsFileName] = (buildings ?? Buildings()).ToJsonString(),
+        [GameDataLoader.MarketFileName] = (market ?? Market()).ToJsonString(),
     };
 
     public static GameData Load() => GameDataLoader.Load(Files());

@@ -22,6 +22,10 @@ public static class GameDataLoader
     public const string MapFileName = "map.json";
     public const string EconomyFileName = "economy.json";
     public const string BuildingsFileName = "buildings.json";
+    public const string MarketFileName = "market.json";
+
+    // Prozentangaben mit bis zu 2 Nachkommastellen → Basispunkte (10 % = 1000).
+    private const long BasisPointsPerPercent = 100;
 
     // Technische Obergrenze, kein Balancing-Wert.
     private const int MaxTicksPerSecond = 1000;
@@ -45,9 +49,10 @@ public static class GameDataLoader
         var provinces = LoadProvinces(Parse<MapFile>(files, MapFileName), resources, nations);
         var economy = LoadEconomy(Parse<EconomyFile>(files, EconomyFileName), resources);
         var buildings = LoadBuildings(Parse<BuildingsFile>(files, BuildingsFileName), resources);
+        var market = LoadMarket(Parse<MarketFile>(files, MarketFileName));
 
         return new GameData(
-            speedLevels, defaultSpeedLevel, economy, resources, nations, provinces, buildings, ComputeContentHash(files));
+            speedLevels, defaultSpeedLevel, economy, market, resources, nations, provinces, buildings, ComputeContentHash(files));
     }
 
     /// <summary>
@@ -129,7 +134,13 @@ public static class GameDataLoader
                 _ => 0,
             };
 
-            resources.Add(new ResourceDefinition(new ResourceId(resources.Count), key, name, tier, production));
+            long basePrice = RequireAmount(entry.BasePrice, Quantities.MoneyScale, ResourcesFileName, $"Ressource '{key}'", "basePrice");
+            if (basePrice == 0)
+            {
+                throw Error(ResourcesFileName, $"Ressource '{key}': 'basePrice' muss größer als 0 sein.");
+            }
+
+            resources.Add(new ResourceDefinition(new ResourceId(resources.Count), key, name, tier, production, basePrice));
         }
 
         return resources;
@@ -150,7 +161,13 @@ public static class GameDataLoader
 
         var startResources = LoadResourceAmounts(file.StartResources, resources, EconomyFileName, "'startResources'");
 
-        return new EconomyDefinition(intervalTicks, taxPerProvince, startMoney, startResources);
+        int factoryCycle = file.FactoryCycleIntervals ?? throw Error(EconomyFileName, "Feld 'factoryCycleIntervals' fehlt.");
+        if (factoryCycle < 1)
+        {
+            throw Error(EconomyFileName, $"'factoryCycleIntervals' muss mindestens 1 sein, ist aber {factoryCycle}.");
+        }
+
+        return new EconomyDefinition(intervalTicks, taxPerProvince, startMoney, startResources, factoryCycle);
     }
 
     private static List<BuildingDefinition> LoadBuildings(BuildingsFile file, IReadOnlyList<ResourceDefinition> resources)
@@ -165,10 +182,11 @@ public static class GameDataLoader
             string context = $"Gebäude '{key}'";
             string name = RequireText(entry.Name, BuildingsFileName, context, "name");
 
-            // Prozent mit bis zu 2 Nachkommastellen → Basispunkte (10 % = 1000). Ohne Angabe: keine Wirkung auf die Produktion.
+            // Ohne Angabe: keine Wirkung auf die Produktion.
             long bonus = entry.ProductionBonusPercent is null
                 ? 0
-                : RequireAmount(entry.ProductionBonusPercent, 100, BuildingsFileName, context, "productionBonusPercent");
+                : RequireAmount(entry.ProductionBonusPercent, BasisPointsPerPercent, BuildingsFileName, context, "productionBonusPercent");
+            var recipe = entry.Recipe is null ? null : LoadRecipe(entry.Recipe, resources, context);
 
             var levelEntries = RequireEntries(entry.Levels, BuildingsFileName, "levels");
             var levels = new List<BuildingLevelDefinition>(levelEntries.Count);
@@ -187,10 +205,58 @@ public static class GameDataLoader
                 levels.Add(new BuildingLevelDefinition(money, costs, buildTicks));
             }
 
-            buildings.Add(new BuildingDefinition(new BuildingId(buildings.Count), key, name, levels, bonus));
+            buildings.Add(new BuildingDefinition(new BuildingId(buildings.Count), key, name, levels, bonus, recipe));
         }
 
         return buildings;
+    }
+
+    private static RecipeDefinition LoadRecipe(RecipeEntry entry, IReadOnlyList<ResourceDefinition> resources, string context)
+    {
+        string recipeContext = $"{context}, Rezept";
+        var inputs = LoadResourceAmounts(entry.Inputs, resources, BuildingsFileName, $"{recipeContext}, 'inputs'");
+        if (inputs.All(amount => amount == 0))
+        {
+            throw Error(BuildingsFileName, $"{recipeContext}: 'inputs' braucht mindestens eine Zutat.");
+        }
+
+        string outputKey = RequireText(entry.Output, BuildingsFileName, recipeContext, "output");
+        var output = resources.FirstOrDefault(r => r.Key == outputKey)
+            ?? throw Error(BuildingsFileName, $"{recipeContext}: unbekannte Ressource '{outputKey}'.");
+        if (output.Tier != ResourceTier.Advanced)
+        {
+            throw Error(BuildingsFileName, $"{recipeContext}: '{outputKey}' ist kein fortgeschrittenes Gut.");
+        }
+
+        long amount = RequireAmount(entry.Amount, Quantities.ResourceScale, BuildingsFileName, recipeContext, "amount");
+        if (amount == 0)
+        {
+            throw Error(BuildingsFileName, $"{recipeContext}: 'amount' muss größer als 0 sein.");
+        }
+
+        return new RecipeDefinition(inputs, output.Id, amount);
+    }
+
+    private static MarketDefinition LoadMarket(MarketFile file)
+    {
+        const string context = "Datei";
+        return new MarketDefinition(
+            RequirePercent(file.PriceChangePercentPerUnit, context, "priceChangePercentPerUnit"),
+            RequirePercent(file.RecoveryPercentPerInterval, context, "recoveryPercentPerInterval"),
+            RequirePercent(file.MinPricePercent, context, "minPricePercent"),
+            RequirePercent(file.SellPricePercent, context, "sellPricePercent"));
+    }
+
+    /// <summary>Prozentwert zwischen 0 und 100 aus market.json, in Basispunkten.</summary>
+    private static long RequirePercent(decimal? value, string context, string field)
+    {
+        long basisPoints = RequireAmount(value, BasisPointsPerPercent, MarketFileName, context, field);
+        if (basisPoints > 100 * BasisPointsPerPercent)
+        {
+            throw Error(MarketFileName, $"'{field}' darf höchstens 100 sein, ist aber {value}.");
+        }
+
+        return basisPoints;
     }
 
     /// <summary>Ressourcenmengen nach lesbarer ID. Fehlende Ressourcen sind 0; unbekannte sind ein Tippfehler.</summary>

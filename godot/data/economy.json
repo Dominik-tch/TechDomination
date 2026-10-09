@@ -7,14 +7,17 @@
   "taxPerProvince": 2.5,
 
   // Jede Nation startet mit diesen Beständen. Ressourcen höchstens 3 Nachkommastellen.
-  "startMoney": 500,
+  "startMoney": 4000,
+
+  // Fabriken machen nur alle so viele Wirtschaftstakte einen Durchlauf je Stufe (Rezepte siehe buildings.json).
+  "factoryCycleIntervals": 4,
   "startResources": {
-    "wood": 50,
-    "steel": 50,
-    "grain": 50,
-    "fish": 50,
-    "gas": 50,
-    "coal": 50,
-    "oil": 50
+    "wood": 400,
+    "steel": 400,
+    "grain": 400,
+    "fish": 400,
+    "gas": 400,
+    "coal": 400,
+    "oil": 400
   }
 }

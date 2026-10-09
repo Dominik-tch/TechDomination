@@ -33,6 +33,31 @@ public static class UiFormat
         return $"{seconds / 60}:{seconds % 60:00}";
     }
 
+    /// <summary>Kosten als Text, z. B. „300 Geld, 30 Holz, 20 Stahl“.</summary>
+    public static string Costs(long money, IReadOnlyList<long> resources, Game.Core.Data.GameData data)
+    {
+        var parts = new List<string> { $"{Money(money)} Geld" };
+        foreach (var resource in data.Resources)
+        {
+            long amount = resources[resource.Id.Value];
+            if (amount > 0)
+            {
+                parts.Add($"{Resource(amount)} {resource.Name}");
+            }
+        }
+
+        return string.Join(", ", parts);
+    }
+
+    /// <summary>Rezept als Text, z. B. „2 Stahl + 5 Holz → 1 Schienen“.</summary>
+    public static string Recipe(Game.Core.Data.RecipeDefinition recipe, Game.Core.Data.GameData data)
+    {
+        var inputs = data.Resources
+            .Where(r => recipe.Inputs[r.Id.Value] > 0)
+            .Select(r => $"{Resource(recipe.Inputs[r.Id.Value])} {r.Name}");
+        return $"{string.Join(" + ", inputs)} → {Resource(recipe.OutputAmount)} {data.GetResource(recipe.Output).Name}";
+    }
+
     /// <summary>Spielzeit als „h:mm:ss“, gerechnet bei Standardgeschwindigkeit.</summary>
     public static string PlayTime(long ticks, Game.Core.Data.GameData data)
     {

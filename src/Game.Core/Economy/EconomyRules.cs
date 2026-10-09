@@ -17,6 +17,10 @@ public static class EconomyRules
     /// <summary>Wird im Tick <paramref name="tick"/> gutgeschrieben? Das ist am Ende jedes vollen Takts der Fall.</summary>
     public static bool IsEconomyTick(long tick, GameData data) => (tick + 1) % data.Economy.IntervalTicks == 0;
 
+    /// <summary>Läuft im Tick <paramref name="tick"/> ein Fabrik-Durchlauf? Am Ende jedes Fabrikzyklus (alle N Wirtschaftstakte).</summary>
+    public static bool IsFactoryTick(long tick, GameData data) =>
+        (tick + 1) % ((long)data.Economy.IntervalTicks * data.Economy.FactoryCycleIntervals) == 0;
+
     /// <summary>
     /// Menge, die eine Provinz pro Takt von ihrem Rohstoff produziert, in Tausendstel:
     /// Basiswert plus Gebäudebonus. Der Bonus bezieht sich immer auf den Basiswert (Stufe 5 à 10 % = +50 %).
@@ -38,7 +42,10 @@ public static class EconomyRules
     // 10 000 Basispunkte = 100 %.
     private const long BasisPointsPerWhole = 10_000;
 
-    /// <summary>Was eine Nation mit ihrem aktuellen Besitz pro Takt einnimmt.</summary>
+    /// <summary>
+    /// Was eine Nation pro Takt einnimmt: Steuern und Provinzproduktion aus dem aktuellen Besitz, dazu der Saldo der Fabriken
+    /// (Produkte minus verbrauchte Zutaten) auf Basis der Durchläufe im letzten Fabrikzyklus, umgerechnet auf einen Takt.
+    /// </summary>
     public static NationIncome IncomePerInterval(GameState state, GameData data, NationId nation)
     {
         ArgumentNullException.ThrowIfNull(state);
@@ -52,6 +59,23 @@ public static class EconomyRules
             {
                 money += data.Economy.TaxPerProvince;
                 resources[province.Resource.Value] += ProductionPerInterval(state, data, province);
+            }
+        }
+
+        var nationState = state.GetNation(nation);
+        foreach (var building in data.Buildings)
+        {
+            if (building.Recipe is not { } recipe)
+            {
+                continue;
+            }
+
+            int runs = nationState.LastFactoryRuns[building.Id.Value];
+            int cycle = data.Economy.FactoryCycleIntervals;
+            resources[recipe.Output.Value] += runs * recipe.OutputAmount / cycle;
+            for (int i = 0; i < recipe.Inputs.Count; i++)
+            {
+                resources[i] -= runs * recipe.Inputs[i] / cycle;
             }
         }
 

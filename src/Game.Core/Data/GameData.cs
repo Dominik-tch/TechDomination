@@ -7,6 +7,7 @@ public sealed class GameData
         IReadOnlyList<SpeedLevelDefinition> speedLevels,
         SpeedLevelDefinition defaultSpeedLevel,
         EconomyDefinition economy,
+        MarketDefinition market,
         IReadOnlyList<ResourceDefinition> resources,
         IReadOnlyList<NationDefinition> nations,
         IReadOnlyList<ProvinceDefinition> provinces,
@@ -16,6 +17,7 @@ public sealed class GameData
         SpeedLevels = speedLevels;
         DefaultSpeedLevel = defaultSpeedLevel;
         Economy = economy;
+        Market = market;
         Resources = resources;
         Nations = nations;
         Provinces = provinces;
@@ -30,6 +32,8 @@ public sealed class GameData
     public SpeedLevelDefinition DefaultSpeedLevel { get; }
 
     public EconomyDefinition Economy { get; }
+
+    public MarketDefinition Market { get; }
 
     /// <summary>Alle Ressourcen, Index = <see cref="ResourceId.Value"/>.</summary>
     public IReadOnlyList<ResourceDefinition> Resources { get; }
@@ -63,4 +67,6 @@ public sealed class GameData
     public bool Contains(NationId id) => id.Value >= 0 && id.Value < Nations.Count;
 
     public bool Contains(BuildingId id) => id.Value >= 0 && id.Value < Buildings.Count;
+
+    public bool Contains(ResourceId id) => id.Value >= 0 && id.Value < Resources.Count;
 }
