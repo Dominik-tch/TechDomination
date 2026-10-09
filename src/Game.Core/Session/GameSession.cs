@@ -1,6 +1,7 @@
 using Game.Core.Commands;
 using Game.Core.Data;
 using Game.Core.Events;
+using Game.Core.Save;
 using Game.Core.State;
 
 namespace Game.Core.Session;
@@ -67,6 +68,42 @@ public sealed class GameSession
         var commands = _pending.ToList();
         _pending.Clear();
         return Simulation.Step(State, Data, commands);
+    }
+
+    /// <summary>
+    /// Erzeugt einen Spielstand aus dem aktuellen Zustand. Verweist auf den laufenden Zustand,
+    /// muss also sofort geschrieben werden (<see cref="SaveGameSerializer.Write"/>).
+    /// </summary>
+    public SaveGame CreateSaveGame() => new(
+        SaveGame.CurrentFormatVersion,
+        Data.ContentHash,
+        State,
+        new SessionSnapshot(Speed.Key, _nextSequence, _pending.ToList()),
+        new HostState());
+
+    /// <summary>
+    /// Setzt eine Partie aus einem Spielstand fort. Nach dem Laden ist das Spiel pausiert (durch den Host).
+    /// </summary>
+    /// <exception cref="SaveGameException">Der Spielstand passt nicht zu den Spieldaten.</exception>
+    public static GameSession FromSaveGame(GameData data, SaveGame save, PlayerId host)
+    {
+        ArgumentNullException.ThrowIfNull(data);
+        ArgumentNullException.ThrowIfNull(save);
+
+        if (save.DataHash != data.ContentHash)
+        {
+            throw new SaveGameException("Der Spielstand wurde mit anderen Spieldaten erstellt und kann nicht geladen werden.");
+        }
+
+        var session = new GameSession(data, save.State, host)
+        {
+            Speed = data.FindSpeedLevel(save.Session.SpeedLevel)
+                ?? throw new SaveGameException($"Unbekannte Geschwindigkeitsstufe '{save.Session.SpeedLevel}' im Spielstand."),
+            PausedBy = host,
+            _nextSequence = save.Session.NextSequence,
+        };
+        session._pending.AddRange(save.Session.PendingCommands);
+        return session;
     }
 
     /// <summary>Jeder Spieler darf pausieren.</summary>

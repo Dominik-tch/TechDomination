@@ -9,11 +9,7 @@ namespace Game.Core.Serialization;
 /// </summary>
 public static class GameStateSerializer
 {
-    private static readonly JsonSerializerOptions Options = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        WriteIndented = false,
-    };
+    private static JsonSerializerOptions Options => CoreJson.Options;
 
     public static byte[] SerializeToUtf8Bytes(GameState state)
     {

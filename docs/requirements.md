@@ -86,6 +86,9 @@ Nur Krieg und Frieden zwischen Nationen.
 ### 10. Speichern und Laden
 - Der Host speichert den kompletten Spielstand.
 - Beim Laden verbinden sich die Spieler und übernehmen ihre Nationen. Fehlende Spieler werden wie bei einem Verbindungsverlust behandelt.
+- Speichern und Laden über ein Menü (Esc). Nach dem Laden ist das Spiel pausiert.
+- Spielstände einer anderen Spielversion oder mit anderem Regelwerk (geänderte Daten) werden mit einer Meldung abgelehnt.
+- **Automatisches Speichern** alle 10 Minuten Spielzeit (bei Standardgeschwindigkeit), rotierend in 3 Dateien.
 
 **Fertig, wenn:** Eine Multiplayer-Partie kann gespeichert, das Spiel beendet und die Partie später mit identischem Zustand fortgesetzt werden.
 

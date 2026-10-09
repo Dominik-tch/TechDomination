@@ -1,9 +1,11 @@
 using Game.Core;
 using Game.Core.Data;
 using Game.Core.Events;
+using Game.Core.Save;
 using Game.Core.Session;
 using Game.Core.State;
 using Godot;
+using TechDomination.Save;
 
 namespace TechDomination;
 
@@ -22,6 +24,7 @@ public partial class SimulationDriver : Node
     private const int MaxTicksPerFrame = 100;
 
     private double _pendingTicks;
+    private long _autosaveIntervalTicks;
 
     public GameSession? Session { get; private set; }
 
@@ -50,6 +53,31 @@ public partial class SimulationDriver : Node
         }
 
         Session = new GameSession(data, GameStateFactory.CreateNew(data, DefaultSeed), host: LocalPlayer);
+        _autosaveIntervalTicks = SaveNames.AutosaveIntervalTicks(data);
+    }
+
+    /// <exception cref="IOException">Die Datei konnte nicht geschrieben werden.</exception>
+    public void Save(string name)
+    {
+        if (Session is not null)
+        {
+            SaveFiles.Write(name, Session.CreateSaveGame());
+        }
+    }
+
+    /// <summary>Ersetzt die laufende Session durch den Spielstand. Danach ist das Spiel pausiert.</summary>
+    /// <exception cref="IOException">Die Datei konnte nicht gelesen werden.</exception>
+    /// <exception cref="SaveGameException">Der Spielstand ist beschädigt oder passt nicht. Die laufende Session bleibt dann unverändert.</exception>
+    public void Load(string name)
+    {
+        if (Data is not { } data)
+        {
+            return;
+        }
+
+        var save = SaveFiles.Read(name, data);
+        Session = GameSession.FromSaveGame(data, save, LocalPlayer);
+        _pendingTicks = 0;
     }
 
     public override void _Process(double delta)
@@ -73,6 +101,27 @@ public partial class SimulationDriver : Node
         for (int i = 0; i < Math.Min(ticks, MaxTicksPerFrame); i++)
         {
             ReportEvents(Session.Advance());
+            AutosaveIfDue();
+        }
+    }
+
+    private void AutosaveIfDue()
+    {
+        long tick = Session!.State.Tick;
+        if (!SaveNames.IsAutosaveTick(tick, _autosaveIntervalTicks))
+        {
+            return;
+        }
+
+        string name = SaveNames.AutosaveName(SaveNames.AutosaveSlot(tick, _autosaveIntervalTicks));
+        try
+        {
+            Save(name);
+            GD.Print($"Automatisch gespeichert: {name} (Tick {tick}).");
+        }
+        catch (IOException e)
+        {
+            GD.PushWarning($"Automatisches Speichern fehlgeschlagen: {e.Message}");
         }
     }
 

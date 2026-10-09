@@ -26,6 +26,13 @@ public static class UiFormat
     /// <summary>Wert mit Vorzeichen, z. B. „+12,5“.</summary>
     public static string Signed(string formatted, long value) => value >= 0 ? $"+{formatted}" : formatted;
 
+    /// <summary>Spielzeit als „h:mm:ss“, gerechnet bei Standardgeschwindigkeit.</summary>
+    public static string PlayTime(long ticks, Game.Core.Data.GameData data)
+    {
+        var time = TimeSpan.FromSeconds(ticks / data.DefaultSpeedLevel.TicksPerSecond);
+        return $"{(int)time.TotalHours}:{time.Minutes:00}:{time.Seconds:00}";
+    }
+
     /// <summary>Rechnet eine Menge pro Wirtschaftstakt in eine Menge pro Minute Echtzeit bei der aktuellen Geschwindigkeit um.</summary>
     public static long PerMinute(long perInterval, GameSession session) =>
         perInterval * session.Speed.TicksPerSecond * 60 / session.Data.Economy.IntervalTicks;

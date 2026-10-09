@@ -201,9 +201,13 @@ Godot steuert nur Zeit und Transport bei; die Regeln („wer darf was“) liegen
   - Formatversion
   - Regelwerk-Kennung + Hash
   - `GameState` (vollständig, inkl. Simulations-RNG und Tick)
-  - Session-Metadaten: Spieler-Slots (Nation → Spielername / KI), damit Spieler beim Laden ihre Nation wieder übernehmen
+  - Session-Teil: Geschwindigkeit, nächste Sequenznummer und **eingeplante Commands** (während der Pause können Commands warten; sie dürfen beim Speichern nicht verloren gehen). Ab M12 zusätzlich die Spieler-Slots (Nation → Spielername / KI), damit Spieler beim Laden ihre Nation wieder übernehmen
   - Host-only-Zustand: KI-Zustand inkl. Zustand des KI-RNG. Er liegt **im Spielstand des Hosts neben dem `GameState`, nicht darin** – der synchronisierte `GameState` enthält ihn nie ([Entscheidung 0002](decisions/0002-eigener-ki-zufallsgenerator.md)).
-- Format: JSON über `System.Text.Json`, komprimiert. Dieselbe `GameState`-Serialisierung wird für Netzwerk-Snapshots verwendet.
+- Format: JSON über `System.Text.Json`, mit GZip komprimiert. Dieselbe `GameState`-Serialisierung wird für Netzwerk-Snapshots verwendet.
+- **Commands** werden polymorph mit einem Typnamen serialisiert (`{ "type": "...", "command": { ... } }`). Jeder Command-Typ wird mit einem festen Namen registriert; ein unbekannter Name beim Laden ist ein Fehler. Command-Log und Netzwerk nutzen dieselbe Serialisierung.
+- **Ablehnen statt reparieren:** Andere Formatversion oder anderer Daten-Hash → Laden wird mit Meldung abgelehnt, das laufende Spiel bleibt unverändert. Migrationen kommen erst, wenn sie gebraucht werden.
+- **Nach dem Laden** ist das Spiel pausiert.
+- **Automatisches Speichern:** alle 10 Minuten Spielzeit bei Standardgeschwindigkeit (in Ticks berechnet, während der Pause also nicht), rotierend in 3 Dateien. Die Datei ergibt sich aus dem Tick.
 - Gespeichert wird **nur an Tick-Grenzen**, nur vom Host.
 - Ablage: `user://saves/` (Godot), Core arbeitet nur mit Streams.
 - **Laden im Multiplayer:** Host lädt, Spieler verbinden sich und werden über den Spielernamen ihrer Nation zugeordnet. Nicht verbundene Spieler → Status „Verbindungsverlust“ (pausiert, Host kann KI einsetzen).

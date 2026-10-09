@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://scripts/ui/ProvinceInfoPanel.cs" id="5_panel"]
 [ext_resource type="PackedScene" path="res://scenes/ui/TimeControls.tscn" id="6_time"]
 [ext_resource type="PackedScene" path="res://scenes/ui/ResourceBar.tscn" id="7_bar"]
+[ext_resource type="PackedScene" path="res://scenes/ui/PauseMenu.tscn" id="8_menu"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main")
@@ -63,3 +64,5 @@ text = "Gebäude:"
 [node name="TimeControls" parent="Hud" instance=ExtResource("6_time")]
 
 [node name="ResourceBar" parent="Hud" instance=ExtResource("7_bar")]
+
+[node name="PauseMenu" parent="Hud" instance=ExtResource("8_menu")]

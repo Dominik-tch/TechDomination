@@ -1,0 +1,130 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/PauseMenu.cs" id="1_menu"]
+
+[node name="PauseMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_menu")
+
+[node name="Dim" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.5)
+
+[node name="Panel" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(520, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = -170.0
+offset_right = 260.0
+offset_bottom = 170.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Pages" type="VBoxContainer" parent="Panel"]
+layout_mode = 2
+
+[node name="MainPage" type="VBoxContainer" parent="Panel/Pages"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="Panel/Pages/MainPage"]
+layout_mode = 2
+text = "Menü"
+horizontal_alignment = 1
+
+[node name="ResumeButton" type="Button" parent="Panel/Pages/MainPage"]
+layout_mode = 2
+text = "Fortsetzen"
+
+[node name="SaveButton" type="Button" parent="Panel/Pages/MainPage"]
+layout_mode = 2
+text = "Speichern"
+
+[node name="LoadButton" type="Button" parent="Panel/Pages/MainPage"]
+layout_mode = 2
+text = "Laden"
+
+[node name="StatusLabel" type="Label" parent="Panel/Pages/MainPage"]
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="SavePage" type="VBoxContainer" parent="Panel/Pages"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="Panel/Pages/SavePage"]
+layout_mode = 2
+text = "Spielstand speichern"
+horizontal_alignment = 1
+
+[node name="NameEdit" type="LineEdit" parent="Panel/Pages/SavePage"]
+layout_mode = 2
+max_length = 64
+placeholder_text = "Name des Spielstands"
+
+[node name="HintLabel" type="Label" parent="Panel/Pages/SavePage"]
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="Buttons" type="HBoxContainer" parent="Panel/Pages/SavePage"]
+layout_mode = 2
+alignment = 2
+
+[node name="BackButton" type="Button" parent="Panel/Pages/SavePage/Buttons"]
+layout_mode = 2
+text = "Zurück"
+
+[node name="ConfirmSaveButton" type="Button" parent="Panel/Pages/SavePage/Buttons"]
+layout_mode = 2
+text = "Speichern"
+
+[node name="LoadPage" type="VBoxContainer" parent="Panel/Pages"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="Panel/Pages/LoadPage"]
+layout_mode = 2
+text = "Spielstand laden"
+horizontal_alignment = 1
+
+[node name="SaveList" type="ItemList" parent="Panel/Pages/LoadPage"]
+custom_minimum_size = Vector2(0, 220)
+layout_mode = 2
+
+[node name="Buttons" type="HBoxContainer" parent="Panel/Pages/LoadPage"]
+layout_mode = 2
+alignment = 2
+
+[node name="BackButton" type="Button" parent="Panel/Pages/LoadPage/Buttons"]
+layout_mode = 2
+text = "Zurück"
+
+[node name="ConfirmLoadButton" type="Button" parent="Panel/Pages/LoadPage/Buttons"]
+layout_mode = 2
+disabled = true
+text = "Laden"
+
+[node name="OverwriteDialog" type="ConfirmationDialog" parent="."]
+title = "Überschreiben?"
+ok_button_text = "Überschreiben"
+cancel_button_text = "Abbrechen"
+
+[node name="ErrorDialog" type="AcceptDialog" parent="."]
+title = "Laden nicht möglich"
